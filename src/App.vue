@@ -1,0 +1,66 @@
+<script setup>
+  import { ref, onMounted } from 'vue'
+  import { RouterView } from 'vue-router'
+  import NavBar from '@/components/layout/NavBar.vue'
+  import { useAuthStore } from '@/stores/authStore'
+  import { useRidesStore } from '@/stores/ridesStore'
+  import LoadingScreen from '@/components/utilities/LoadingScreen.vue'
+
+  const authStore = useAuthStore()
+  const ridesStore = useRidesStore()
+  const isLoading = ref(true)
+  const message = ref('')
+
+  async function init() {
+    authStore.init()
+    ridesStore.getRides()
+    ridesStore.getDates()
+    ridesStore.getUsers()
+
+    const validUser = await authStore.checkValidUserData()
+
+    if (!validUser) return 'offline'
+
+    await ridesStore.validData()
+
+    return 'ok'
+  }
+
+  message.value = 'Obteniendo datos...'
+
+  Promise.race([init(), wait(10000)]).then(result => {
+    if (result === 'ok') {
+      isLoading.value = false
+    } else if (result === 'offline') {
+      message.value = 'No hay conexion con el servidor. Intentalo de nuevo mas tarde'
+    } else {
+      message.value = 'El servidor tarda mucho en responder. Intentalo de nuevo mas tarde'
+    }
+  })
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms, 'timeout'))
+  }
+</script>
+
+<template>
+  <NavBar />
+  <LoadingScreen
+    :isLoading="isLoading"
+    :message="message"
+  />
+  <main
+    v-if="!isLoading"
+    class="main"
+  >
+    <RouterView />
+  </main>
+</template>
+
+<style scoped>
+  .main {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    margin-top: var(--header-height);
+  }
+</style>

@@ -1,0 +1,138 @@
+/* ===================== */
+/* FormKit */
+/* ===================== */
+
+.cs-form .formkit-wrapper {
+    max-width: 100%;
+}
+
+.cs-form .formkit-outer .formkit-inner,
+.cs-form .formkit-outer .formkit-input {
+    position: static;
+}
+
+/* Input border */
+.cs-form .formkit-outer .formkit-inner:focus-within {
+    box-shadow: 0 0 0 2px var(--color-std-high);
+}
+
+/* Inputs and labels */
+.cs-form .formkit-outer .formkit-label,
+.cs-form .formkit-outer .formkit-input {
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: inherit;
+    line-height: 1.6rem;
+}
+
+.cs-form .formkit-outer .formkit-input::placeholder {
+    opacity: 0.6;
+}
+
+
+
+/* Buttons */
+.cs-form .submit-button,
+.cs-form .cancel-button {
+    --fk-margin-outer: 0;
+    --fk-margin-button: 0;
+    display: inline-block;
+}
+
+.cs-form .submit-button button.formkit-input,
+.cs-form .cancel-button button.formkit-input {
+    align-items: center;
+    font-size: 1.8rem;
+    line-height: 1.5;
+    min-width: 100px;
+    height: 40px;
+    padding: 12px 0 14px 0;
+    margin-bottom: 0;
+    border-style: solid;
+    border-width: 2px 2px 2px 2px;
+    border-radius: 10px;
+    box-shadow: 0px 17px 5px -15px rgba(0, 0, 0, 0.26);
+}
+
+.cs-form .button-full-width button.formkit-input {
+    width: 100%;
+}
+
+/* Submit button */
+.cs-form .submit-button button.formkit-input {
+    fill: #FFFFFF;
+    color: #FFFFFF;
+    border-color: var(--color-std-high);
+    background-color: var(--color-std-high);
+}
+
+
+/* Submit button hover*/
+.cs-form .submit-button button.formkit-input:hover {
+    color: var(--color-std-high);
+    background-color: var(--color-std-background);
+    border-color: var(--color-std-high);
+}
+
+/* Cancel button */
+.cs-form .cancel-button button.formkit-input {
+    fill: #4c4c4c;
+    color: #4c4c4c;
+    border-color: #999999;
+    background-color: #e6e6e6;
+}
+
+/* Cancel button hover */
+.cs-form .cancel-button button.formkit-input:hover {
+    color: var(--color-std-high);
+    background-color: var(--color-std-background);
+    border-color: var(--color-std-high);
+}
+
+/* Other inputs and messages */
+
+.cs-form .formkit-outer .cs-date-input {
+    padding-bottom: 15px;
+}
+
+.cs-form .formkit-messages .formkit-message {
+    font-size: 1.4rem;
+    font-weight: 400;
+    line-height: 1.4rem;
+    padding-top: 16px;
+}
+
+.cs-form .formkit-outer .formkit-message {
+    font-size: 1.2rem;
+    font-weight: 400;
+    line-height: 1.2rem;
+    padding-top: 4px;
+}
+
+.cs-form .formkit-outer .formkit-help {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: inherit;
+    line-height: 1.2rem;
+}
+
+.cs-form .formkit-outer .formkit-wrapper input[type=color] {
+    height: 100%;
+    background-color: blue;
+}
+
+
+
+/* .cs-form .formkit-outer .formkit-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+	background-color: orangered;
+}
+.cs-form .formkit-outer .formkit-wrapper input[type="color"]::-webkit-color-swatch {
+	background-color: orangered;
+} */
+
+@media (max-width: 640px) {
+    .cs-form .submit-button,
+    .cs-form .cancel-button {
+        margin-bottom: 8px;
+    }
+}
