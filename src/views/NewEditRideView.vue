@@ -193,7 +193,7 @@
       <div class="user-view-grid">
         <FormKit
           label="Nombre"
-          outer-class="col-start-1 col-end-4"
+          outer-class="col-start-1 col-end-4 w-full"
           type="text"
           name="name"
           placeholder="Nombre de la ruta"
@@ -210,7 +210,7 @@
             <div class="flex items-center">
               <FormKit
                 label="Fecha"
-                outer-class="w-56"
+                outer-class=""
                 type="date"
                 :name="'date' + index"
                 placeholder="Fecha"
@@ -220,7 +220,7 @@
 
             <FormKit
               label="Dias"
-              outer-class="w-24"
+              input-class="w-[5rem]"
               type="number"
               :name="'days' + index"
               placeholder="Dias de duracion la ruta"

@@ -130,11 +130,11 @@
 </script>
 
 <template>
-  <div class="bg-white shadow-md max-w-screen-md mx-auto">
+  <div class="bg-white shadow-md max-w-screen-sm mx-auto">
     <h1 class="text-4xl font-black ml-10 pt-10">{{ pageTitle }}</h1>
     <FormKit
       type="form"
-      form-class="cs-form mt-10 p-10 w-full grid md:grid-cols-2 md:grid-rows-3 gap-8 grid-cols-1 grid-rows-4"
+      form-class="cs-form form-class"
       :actions="false"
       @submit="submitHandler"
       @submit-invalid="showErrors"
@@ -144,7 +144,8 @@
     >
       <FormKit
         label="Nombre"
-        outer-class="md:col-span-2"
+        outer-class="col-span-2"
+        input-class=""
         type="text"
         name="name"
         placeholder="Nombre"
@@ -155,7 +156,8 @@
 
       <FormKit
         label="Abreviatura"
-        outer-class="md:col-span-2"
+        outer-class="col-span-2"
+        input-class="w-32"
         type="text"
         name="shortName"
         placeholder="Abreviatura"
@@ -178,14 +180,13 @@
         label="Personalizar tu color"
         outer-class=""
         inner-class="h-16"
-        input-class=""
         type="color"
         name="color"
         placeholder="Color de la abreviatura"
         v-model.trim="formData.color"
       />
 
-      <div class="md:col-start-1 md:col-span-2 justify-self-end pt-8 grid grid-cols-2 gap-x-4">
+      <div class="col-span-2 justify-self-end pt-8 grid grid-cols-2 gap-x-4">
         <FormKit
           type="button"
           label="Cancelar"
@@ -207,4 +208,19 @@
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+  .form-class {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    grid-template-rows: repeat(4, min-content);
+    gap: 2rem;
+    margin-top: 2.5rem;
+    padding: 2.5rem;
+    width: 100%;
+  }
+
+  /* @media (min-width: 768px) {
+  } */
+
+  /* cs-form mt-10 p-10 w-full grid md:grid-cols-2 md:grid-rows-3 gap-8 grid-cols-1 grid-rows-4 */
+</style>

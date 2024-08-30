@@ -216,7 +216,7 @@
           >
             <FormKit
               label="Fecha"
-              outer-class="w-56"
+              outer-class=""
               type="date"
               :name="'date'"
               placeholder="Fecha"
@@ -226,10 +226,10 @@
           <FormKit
             v-if="showFormkit"
             label="Dias"
-            outer-class="w-24"
+            input-class="w-[5rem]"
             type="number"
             :name="'days'"
-            placeholder="Dias de duracion la ruta"
+            placeholder=""
             validation="required"
             min="1"
             :validation-messages="{ required: 'La duración es obligatoria' }"
