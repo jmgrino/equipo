@@ -144,7 +144,7 @@
       timeoutID = setTimeout(() => {
         formData.dates[index].confirm = false
         forceRender()
-      }, 5000)
+      }, 3000)
     }
 
     forceRender()
@@ -169,14 +169,10 @@
     await nextTick()
     renderDates.value = true
   }
-
-  function wait(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-  }
 </script>
 
 <template>
-  <div class="bg-white shadow-md max-w-screen-md mx-auto">
+  <div class="bg-white shadow-md max-w-7xl mx-auto">
     <div class="flex justify-between items-center pt-5 gap-x-4">
       <h1 class="text-4xl font-black ml-10">{{ pageTitle }}</h1>
     </div>
@@ -207,10 +203,10 @@
             v-for="(date, index) in formData.dates"
             :key="index"
           >
-            <div class="flex items-center">
+            <div class="flex items-center col-start-1">
               <FormKit
                 label="Fecha"
-                outer-class=""
+                input-class="min-w-[15rem]"
                 type="date"
                 :name="'date' + index"
                 placeholder="Fecha"
@@ -230,12 +226,18 @@
               v-model.trim="formData.dates[index].days"
             />
 
-            <div v-if="date.message">
-              <p class="text-cs-std mt-5">No se puede borrar porque hay ciclistas apuntados</p>
+            <div
+              v-if="date.message"
+              class="sm:col-start-1 sm:col-span-3"
+            >
+              <p class="text-cs-std mt-5 sm:mt-0">No se puede borrar porque hay ciclistas apuntados</p>
             </div>
-            <div v-else-if="date.confirm">
+            <div
+              v-else-if="date.confirm"
+              class="sm:col-start-1 sm:col-span-3"
+            >
               <button
-                class="btn btn-std btn-submit mt-6"
+                class="btn btn-std btn-submit mt-6 sm:mt-0"
                 @click="confirmDeleteDate(index)"
               >
                 Confirmar borrado
@@ -281,7 +283,9 @@
       -->
 
       <div class="pt-8 buttons-grid">
-        <div class="justify-self-center sm:justify-self-end flex flex-wrap items-center content-center justify-end gap-x-4">
+        <div
+          class="sm:justify-self-center justify-self-end row-start-1 col-start-2 sm:col-start-1 sm:col-span-2 flex flex-wrap items-center content-center justify-end gap-x-4"
+        >
           <FormKit
             type="button"
             label="Cancelar"
@@ -298,11 +302,11 @@
           />
         </div>
 
-        <span class="sm:col-span-2 p-2 text-[red] text-xl justify-self-center sm:justify-self-end">{{ errorMessage }}</span>
+        <span class="col-span-2 p-2 text-[red] text-xl sm:justify-self-center justify-self-end">{{ errorMessage }}</span>
 
         <button
-          v-if="!isNew"
-          class="btn btn-std btn-submit sm:row-start-1 sm:col-start-1 justify-self-center"
+          v-show="!isNew"
+          class="btn btn-std btn-submit justify-self-center row-start-1 col-start-1 sm:row-start-2"
           @click.prevent="deleteRide"
         >
           Borrar ruta

@@ -228,6 +228,11 @@
   /******************************/
 
   @media (max-width: 48em) {
+    .header {
+      padding: 0 1.4rem;
+      z-index: 2;
+    }
+
     .btn-mobile-nav {
       display: block;
       z-index: 999;

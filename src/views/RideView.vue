@@ -88,6 +88,8 @@
     date.id = dateId
     showDateFields(false)
     dates.push(date)
+    formData.date = ''
+    formData.days = 1
     forceRender()
   }
 
@@ -106,7 +108,7 @@
       timeoutID = setTimeout(() => {
         dates[index].confirm = false
         forceRender()
-      }, 500000)
+      }, 3000)
     }
 
     forceRender()
@@ -136,15 +138,15 @@
     <div class="user-view-grid">
       <span
         v-if="fetching"
-        class="text-cs-h4 text-color-std-high-tint"
+        class="text-cs-h4 text-color-std-high-tint sm:row-start-2"
         >Esperando datos...</span
       >
       <span
         v-else="fetching"
-        class="text-cs-h4 text-color-std"
+        class="text-cs-h4 text-color-std sm:row-start-2"
         >Ruta creada por {{ createdBy.name }}</span
       >
-      <div class="justify-self-end flex gap-5">
+      <div class="justify-self-end flex gap-5 sm:col-span-2">
         <button
           class="btn btn-std btn-cancel"
           @click="router.push({ name: 'rides' })"
@@ -173,13 +175,19 @@
             v-for="(date, index) in dates"
             :key="index"
           >
-            <span class="text-cs-h3">{{ formatDate(date.date) }}</span>
+            <span class="text-cs-h3 col-start-1">{{ formatDate(date.date) }}</span>
             <span class="text-cs-h3">{{ date.days }} {{ date.days == 1 ? 'dia' : 'dias' }}</span>
 
-            <div v-if="date.message">
+            <div
+              v-if="date.message"
+              class="sm:col-start-1 sm:col-span-3"
+            >
               <p class="text-cs-std">No se puede borrar porque hay ciclistas apuntados</p>
             </div>
-            <div v-else-if="date.confirm">
+            <div
+              v-else-if="date.confirm"
+              class="sm:col-start-1 sm:col-span-3"
+            >
               <button
                 class="btn btn-std btn-submit"
                 @click="confirmDeleteDate(index)"
@@ -194,7 +202,7 @@
                 size="3.2rem"
                 title="Borrar fecha"
                 @click="deleteDate(index)"
-                :stroke="date.users ? 'rgba(90,118,135,0.5)' : 'currentcolor'"
+                :stroke="date.users?.length ? 'rgba(90,118,135,0.5)' : 'currentcolor'"
               >
               </IconDelete>
             </div>
@@ -216,7 +224,7 @@
           >
             <FormKit
               label="Fecha"
-              outer-class=""
+              input-class="min-w-[15rem]"
               type="date"
               :name="'date'"
               placeholder="Fecha"
@@ -239,7 +247,7 @@
             v-if="showFormkit"
             type="button"
             label="Cancelar"
-            outer-class="cancel-button"
+            outer-class="cancel-button sm:justify-self-end"
             wrapper-class="mt-6"
             @click.prevent="showDateFields(false)"
           />
@@ -296,5 +304,11 @@
   }
   .pre-line {
     white-space: pre-line;
+  }
+
+  @media (max-width: 640px) {
+    .add-date-grid {
+      grid-template-columns: max-content max-content;
+    }
   }
 </style>

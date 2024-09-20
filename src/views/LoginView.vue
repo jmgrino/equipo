@@ -72,15 +72,16 @@
         :validation-messages="{ required: 'El Nombre de usuario es obligatorio' }"
         v-model.trim="formData.email"
       />
+
       <FormKit
         label="Contraseña"
-        outer-class=""
         type="password"
+        prefix-icon="password"
+        suffix-icon="eyeClosed"
         name="password"
         placeholder="Contraseña"
-        suffix-icon="eyeClosed"
         @suffix-icon-click="handleIconClick"
-        suffix-icon-class="hover:text-color-std-high text-3xl cursor-pointer"
+        suffix-icon-class="custom-icon-class"
         validation-visibility="submit"
         :validation="[['required'], ['*length', 6], ['matches', /^[\x20-\x7E]{6,}$/]]"
         :validation-messages="{
@@ -110,7 +111,7 @@
   </div>
 </template>
 
-<style scoped>
+<style>
   /* grid gap-8 grid-cols-1 grid-rows-4 */
 
   .login-grid {

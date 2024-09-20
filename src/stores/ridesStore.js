@@ -43,7 +43,6 @@ export const useRidesStore = defineStore('ridesStore', () => {
   }
 
   function getRides() {
-    console.log('init getRides')
     const q = collection(db, 'rides')
     const unsubRides = onSnapshot(q, querySnapshot => {
       rides.value = []
@@ -57,7 +56,6 @@ export const useRidesStore = defineStore('ridesStore', () => {
 
       sortDates(rides.value)
       validRides.value = true
-      console.log('getRides')
 
       // TEST
       // let dupRides = rides.value.slice()
@@ -79,7 +77,6 @@ export const useRidesStore = defineStore('ridesStore', () => {
       })
 
       sortDates(dates.value)
-      console.log('getDates')
       validDates.value = true
       datesSeq.value++
     })
@@ -97,7 +94,6 @@ export const useRidesStore = defineStore('ridesStore', () => {
         }
         users.value.push(user)
       })
-      console.log('getUsers', users.value)
       validUsers.value = true
     })
   }

@@ -42,10 +42,6 @@
     isModalOpen.value = true
 
     isDisabled.value = false
-    // console.log(authStore.errorMessage)
-    // if (authStore.errorMessage === '') {
-    //   router.push({ name: 'login' })
-    // }
   }
 
   function showErrors(node) {
@@ -85,44 +81,6 @@
         :validation-messages="{ required: 'El Nombre de usuario es obligatorio' }"
         v-model.trim="formData.email"
       />
-      <!-- <FormKit
-        label="Contraseña"
-        outer-class=""
-        type="password"
-        name="password"
-        placeholder="Contraseña"
-        suffix-icon="eyeClosed"
-        @suffix-icon-click="handleIconClick"
-        suffix-icon-class="hover:text-color-std-high text-3xl cursor-pointer"
-        validation-visibility="submit"
-        :validation="[['required'], ['*length', 6], ['matches', /^[\x20-\x7E]{6,}$/]]"
-        :validation-messages="{
-          required: 'La contraseña es obligatoria',
-          length: 'La contraseña de tener como minimo 6 caracteres',
-          matches: 'Hay caracters no permitidos en la contraseña',
-        }"
-        v-model.trim="formData.password"
-      />
-
-      <FormKit
-        v-if="showConfirm"
-        label="Repite la contraseña"
-        outer-class=""
-        type="password"
-        name="password_confirm"
-        placeholder="Contraseña"
-        suffix-icon="eyeClosed"
-        @suffix-icon-click="handleIconClick"
-        suffix-icon-class="hover:text-color-std-high text-3xl cursor-pointer"
-        validation-visibility="submit"
-        :validation="[['required'], ['confirm'], ['*length', 6], ['matches', /^[\x20-\x7E]{6,}$/]]"
-        :validation-messages="{
-          required: 'La contraseña es obligatoria',
-          length: 'La contraseña de tener como minimo 6 caracteres',
-          matches: 'Hay caracters no permitidos en la contraseña',
-        }"
-        v-model.trim="formData.password2"
-      /> -->
 
       <div class="send-grid">
         <FormKit

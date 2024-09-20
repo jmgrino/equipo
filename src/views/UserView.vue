@@ -33,15 +33,15 @@
   <div class="bg-white shadow-md max-w-7xl mx-auto p-4 user-view-grid">
     <span
       v-if="fetching"
-      class="text-cs-h4 text-color-std-high-tint"
+      class="text-cs-h4 text-color-std-high-tint md:col-span-2"
       >Esperando datos...</span
     >
     <span
       v-else
-      class="text-cs-h4 text-color-std-high-tint"
+      class="text-cs-h4 text-color-std-high-tint md:col-span-2"
       >{{ user.email }}</span
     >
-    <div class="justify-self-end flex gap-5">
+    <div class="justify-self-end flex gap-5 md:col-span-2 md:row-start-1 sm:justify-self-center">
       <button
         class="btn btn-std btn-cancel"
         @click="router.push({ name: 'rides' })"

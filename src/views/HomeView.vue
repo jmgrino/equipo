@@ -10,12 +10,9 @@
   const message = ref('')
 
   async function init() {
-    console.log('Init')
     if (!navigator.onLine) return 'offline'
 
     const validUser = await authStore.checkValidUserData()
-
-    console.log('validUser', validUser)
 
     if (!validUser) return false
 
@@ -25,30 +22,18 @@
 
     await ridesStore.validData()
 
-    console.log('before wait new')
     const restimeout = await wait(5000)
-    console.log('restimeout', restimeout)
-    console.log('after wait')
-
-    console.log('OK')
     return 'ok'
   }
-
-  console.log('Home')
-
-  // init()
 
   message.value = ''
 
   Promise.race([init(), wait(100)]).then(result => {
-    console.log('result', result)
     if (result === 'ok') {
-      console.log('router push')
       router.push({ name: 'rides' })
     } else if (result === 'offline') {
       message.value = 'No hay conexión a Internet'
     } else {
-      console.log('timeout')
       message.value = 'El servidor tarda mucho en responder. Intentalo de nuevo mas tarde'
     }
   })

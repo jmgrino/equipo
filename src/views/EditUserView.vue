@@ -70,7 +70,6 @@
 
   async function getUser(id) {
     const user = await authStore.getUser(id)
-    console.log('User', user)
     pageTitle.value = user.email
     Object.assign(formData, user)
   }
@@ -78,13 +77,8 @@
   watch(
     () => formData.stdColor,
     newValue => {
-      console.log('--------watch stdColor')
-      console.log('newValue', newValue)
-
       if (newValue) {
-        console.log('Change color to', stdColorHexs[newValue])
         formData.color = stdColorHexs[newValue]
-        console.log('formData.color', formData.color)
       }
     }
   )
@@ -161,14 +155,15 @@
         type="text"
         name="shortName"
         placeholder="Abreviatura"
-        validation="required"
-        :validation-messages="{ required: 'La abreviatura es obligatoria' }"
+        maxlength="3"
+        validation="required|length:3"
+        :validation-messages="{ required: 'La abreviatura es obligatoria', length: 'La abreviatura debe ser de tres lettras' }"
         v-model.trim="formData.shortName"
       />
 
       <FormKit
         label="Elige un color"
-        outer-class=""
+        outer-class="sm:col-span-2"
         type="select"
         name="colorstd"
         :options="stdColorNames"
@@ -178,7 +173,7 @@
 
       <FormKit
         label="Personalizar tu color"
-        outer-class=""
+        outer-class="sm:col-span-2"
         inner-class="h-16"
         type="color"
         name="color"
@@ -221,6 +216,4 @@
 
   /* @media (min-width: 768px) {
   } */
-
-  /* cs-form mt-10 p-10 w-full grid md:grid-cols-2 md:grid-rows-3 gap-8 grid-cols-1 grid-rows-4 */
 </style>

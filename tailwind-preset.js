@@ -1,5 +1,11 @@
 module.exports = {
   theme: {
+    screens: {
+      sm: { max: '480px' },
+      md: { max: '768px' },
+      lg: { max: '976px' },
+      xl: { max: '1440px' },
+    },
     extend: {
       fontSize: {
         '10px': '1rem',

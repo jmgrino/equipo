@@ -51,12 +51,10 @@
 <template>
   <transition name="fade">
     <div v-if="isModalVisible">
-      <!-- <div
-        @click="onToggle"
-        class="absolute bg-black opacity-70 inset-0 z-0"
-      ></div> -->
       <div class="absolute bg-black opacity-70 inset-0 z-0"></div>
-      <div class="w-full max-w-lg p-3 relative mx-auto my-auto rounded-xl shadow-lg bg-white">
+      <div
+        class="w-full max-w-lg p-3 absolute bottom-6 left-1/2 -translate-x-1/2 mx-auto my-auto rounded-xl shadow-lg bg-white"
+      >
         <div>
           <div class="text-center p-3 flex-auto justify-center leading-6">
             <svg
@@ -71,12 +69,10 @@
                 clip-rule="evenodd"
               />
             </svg>
-            <!-- <h2 class="text-cs-h2 font-bold py-4">Are you sure?</h2>
-            <p class="text-cs-std text-gray-500 px-8">Do you really want to exit without saving your work?</p> -->
             <h2 class="text-cs-h2 font-bold py-4">{{ header }}</h2>
             <p class="text-cs-std text-gray-500 px-8">{{ paragraph }}</p>
           </div>
-          <div class="p-3 mt-2 text-center space-x-4 md:block">
+          <div class="p-3 mt-2 text-center space-x-4">
             <button
               v-for="button in buttons"
               :class="`btn btn-std btn-${button.type}`"
@@ -84,18 +80,6 @@
             >
               {{ button.label }}
             </button>
-            <!-- <button
-              @click="onResult(false)"
-              class="btn btn-cancel"
-            >
-              Cancelar
-            </button>
-            <button
-              @click="onResult(true)"
-              class="btn btn-submit"
-            >
-              Borrar
-            </button> -->
           </div>
         </div>
       </div>

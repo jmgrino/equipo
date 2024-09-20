@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted, watch } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/authStore'
   import { useRidesStore } from '@/stores/ridesStore'
@@ -15,14 +15,57 @@
   const render = ref(false)
   const currentUser = ref('')
   const currentShortname = ref('')
+  const userAdmin = ref('')
   const userIncluded = ref(false)
+  const filterText = ref('Pendientes')
+  const rideFilter = ref('pending')
 
-  let usersList = ref({})
-  let datesList = ref({})
+  let usersList = ref([])
+  let datesList = ref([])
+  let filteredRides = ref([])
+
+  onMounted(() => {
+    rideFilter.value = localStorage.getItem('rideFilter') || ''
+  })
+
+  watch(rideFilter, newVal => {
+    localStorage.setItem('rideFilter', newVal)
+  })
+
+  const today = computed(() => {
+    const currentdate = new Date()
+    return (
+      currentdate.getFullYear() +
+      '-' +
+      ('0' + (currentdate.getMonth() + 1)).slice(-2) +
+      '-' +
+      ('0' + currentdate.getDate()).slice(-2)
+    )
+  })
 
   ridesStore.validData().then(() => {
     usersList = computed(() => {
       return ridesStore.deepCopy(ridesStore.users)
+    })
+
+    filteredRides = computed(() => {
+      let filteredRides
+      switch (rideFilter.value) {
+        case 'pending':
+          filterText.value = 'Pendientes'
+          filteredRides = ridesStore.rides.filter(ride => ride.date >= today.value || ride.date === '')
+          break
+        case 'old':
+          filterText.value = 'Antiguas'
+          filteredRides = ridesStore.rides.filter(ride => ride.date < today.value && ride.date !== '')
+          break
+        default:
+          filterText.value = 'Pendientes'
+          filteredRides = ridesStore.rides.filter(ride => ride.date >= today.value || ride.date === '')
+          break
+      }
+
+      return filteredRides
     })
 
     datesList = computed(() => {
@@ -30,6 +73,11 @@
 
       currentUser.value = authStore.user.id
       currentShortname.value = authStore.user.shortName
+      if (authStore.user.admin) {
+        userAdmin.value = true
+      } else {
+        userAdmin.value = false
+      }
 
       dates.forEach(date => {
         userIncluded.value = false
@@ -50,7 +98,6 @@
           date.shortNames.sort((a, b) => (a.name === b.name ? 0 : a.name < b.name ? -1 : 1))
         }
       })
-      console.log(dates)
       return dates
     })
 
@@ -71,17 +118,28 @@
     router.push({ name: 'editRide', params: { id } })
   }
 
-  function addShortname(index, date) {
-    ridesStore.addDateUser(date.id, currentUser.value)
+  function addShortname(date, user) {
+    const userId = user ? user.id : currentUser.value
+
+    ridesStore.addDateUser(date.id, userId)
   }
 
-  function removeShortname(index, date) {
-    ridesStore.removeDateUser(date.id, currentUser.value)
+  function removeShortname(date, user) {
+    const userId = user ? user.id : currentUser.value
+
+    ridesStore.removeDateUser(date.id, userId)
+  }
+  function filterButtonClick() {
+    if (rideFilter.value === 'pending') {
+      rideFilter.value = 'old'
+    } else {
+      rideFilter.value = 'pending'
+    }
   }
 </script>
 
 <template>
-  <div class="sm:container mx-auto px-3">
+  <div class="container mx-auto px-3">
     <div class="fixed-on-top">
       <button
         class="btn btn-submit btn-std"
@@ -90,19 +148,29 @@
       ></button>
     </div>
 
-    <h1
-      class="cs-h1"
-      ref="topRef"
-    >
-      Rutas
-    </h1>
+    <div class="flex gap-4 items-center">
+      <h1
+        class="cs-h1"
+        ref="topRef"
+      >
+        Rutas
+      </h1>
+      <button
+        class="btn btn-selector btn-min"
+        @click="filterButtonClick"
+      >
+        {{ filterText }}
+      </button>
+    </div>
 
     <div v-if="render">
       <RideItem
-        v-for="ride in ridesStore.rides"
+        v-for="ride in filteredRides"
         :ride="ride"
         :dates="datesList.filter(date => date.ride === ride.id)"
         :currentShortname="currentShortname"
+        :userAdmin="userAdmin"
+        :usersList="usersList"
         @view-ride-event="viewRide"
         @edit-ride-event="editRide"
         @add-shortname="addShortname"
@@ -116,7 +184,8 @@
   .fixed-on-top {
     position: fixed;
     top: 8.4rem;
-    right: 4.8rem;
+    right: 2rem;
+    z-index: 1;
   }
 
   .btn-add::after {
@@ -136,9 +205,6 @@
     line-height: 1;
   }
 
-  /* .btn.btn-min {
-    font-size: 3.4rem;
-    padding: 0 12px 6px 12px;
-    line-height: 1;
-  } */
+  .filter-button {
+  }
 </style>
