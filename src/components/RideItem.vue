@@ -4,6 +4,7 @@
   import IconPlus from '@/components/icons/IconPlus.vue'
   import IconMinus from '@/components/icons/IconMinus.vue'
   import IconList from '@/components/icons/IconList.vue'
+  import IconMountain from '@/components/icons/IconMountain.vue'
   import UserBadge from '@/components/UserBadge.vue'
 
   const props = defineProps({
@@ -113,7 +114,16 @@
 
 <template>
   <div class="text-16px p-2 border-b ride-layout border-color-std">
-    <p class="row-start-1 col-start-1 col-end-4 font-semibold">{{ ride.name }}</p>
+    <div class="row-start-1 col-start-1 col-end-4">
+      <span class="font-semibold mr-2">{{ ride.name }}</span>
+      <IconMountain
+        v-if="ride.type === 'BTT'"
+        class="icon"
+        size="3.0rem"
+        title="MTB"
+        top="-8px"
+      />
+    </div>
     <div class="row-start-2 col-start-1 dates-container">
       <template
         v-for="(date, index) in localDates"

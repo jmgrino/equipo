@@ -59,8 +59,16 @@
 
 <style scoped>
   .main {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+    padding-left: 4.8rem;
+    padding-right: 4.8rem;
     margin-top: var(--header-height);
+  }
+
+  @media (max-width: 640px) {
+    .main {
+      padding-left: 8px;
+      padding-right: 8px;
+      margin-top: var(--header-height);
+    }
   }
 </style>

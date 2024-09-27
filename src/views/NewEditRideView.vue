@@ -14,10 +14,13 @@
 
   const initialValues = {
     name: '',
+    type: 'carretera',
     note: '',
     owner: '',
     dates: [],
   }
+
+  const rideType = ['Carretera', 'BTT', 'Gravel']
 
   let formData = reactive({})
 
@@ -172,13 +175,13 @@
 </script>
 
 <template>
-  <div class="bg-white shadow-md max-w-7xl mx-auto">
+  <div class="bg-white shadow-md max-w-7xl mx-auto md:max-w-full md:shadow-none">
     <div class="flex justify-between items-center pt-5 gap-x-4">
       <h1 class="text-4xl font-black ml-10">{{ pageTitle }}</h1>
     </div>
     <FormKit
       type="form"
-      form-class="cs-form mt-10 p-10 w-full "
+      form-class="cs-form mt-10 p-10 w-full md:p-5"
       :actions="false"
       @submit="submitHandler"
       @submit-invalid="showErrors"
@@ -196,6 +199,15 @@
           validation="required"
           :validation-messages="{ required: 'El Nombre de la ruta es obligatorio' }"
           v-model.trim="formData.name"
+        />
+
+        <FormKit
+          label="Tipo de ruta"
+          outer-class="col-start-1 col-end-4 w-[16.5rem]"
+          type="select"
+          name="type"
+          :options="rideType"
+          v-model.trim="formData.type"
         />
 
         <template v-if="renderDates">

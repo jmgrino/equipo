@@ -69,6 +69,7 @@
 
     <nav class="main-nav">
       <ul class="main-nav-list">
+        <h3 class="text-cs-h4 md:mt-4 hidden md:block">Versió 0.1</h3>
         <li>
           <a
             class="main-nav-link"
@@ -250,6 +251,7 @@
 
       display: flex;
       align-items: center;
+      align-items: flex-start;
       justify-content: center;
       transition: all 0.3s ease-in;
 

@@ -134,7 +134,7 @@
 </script>
 
 <template>
-  <div class="bg-white shadow-md max-w-7xl mx-auto p-4">
+  <div class="bg-white shadow-md max-w-7xl mx-auto p-4 md:max-w-full md:shadow-none">
     <div class="user-view-grid">
       <span
         v-if="fetching"
@@ -168,6 +168,8 @@
     >
       <span class="text-cs-h3">Nombre:</span>
       <span class="text-cs-h3">{{ ride.name }}</span>
+      <span class="text-cs-h3">Tipo:</span>
+      <span class="text-cs-h3">{{ ride.type }}</span>
       <span class="text-cs-h3">Fechas:</span>
       <div class="dates-grid cs-form">
         <template v-if="renderDates">

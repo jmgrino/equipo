@@ -45,6 +45,31 @@
     opacity: 0.6;
 }
 
+/* Select */
+
+.formkit-inner:has(select) {
+    padding: 0;
+    outline: none;
+    box-shadow: none;
+}
+
+.formkit-inner:focus-within:has(select) {
+    outline: none;
+}
+
+.formkit-inner > select {
+    height: 31px;
+    outline: none;
+    box-shadow: none;
+    border: none;
+}
+
+/* .formkit-inner > select option {
+} */
+
+
+/* Password Icon */
+
 .custom-icon-class {
     width: 2.5rem;
     height: 2rem;
@@ -61,7 +86,7 @@
 /* Color input */
 
 input.formkit-input[type=color] {
-    height: 33px;
+    height: 31px;
     width: 5rem;
     padding: 0;
     cursor: pointer;

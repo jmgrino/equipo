@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { db } from '@/db/firebase/firebase'
 import {
@@ -229,8 +229,8 @@ export const useRidesStore = defineStore('ridesStore', () => {
     }
   }
 
-  function sortDates(dates) {
-    dates.sort(function (a, b) {
+  function sortDates(rides) {
+    rides.sort(function (a, b) {
       if (a.date === '') {
         return 1
       } else if (b.date === '') {

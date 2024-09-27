@@ -50,14 +50,16 @@
 
     filteredRides = computed(() => {
       let filteredRides
+
+      const ridesCopy = ridesStore.deepCopy(ridesStore.rides)
       switch (rideFilter.value) {
         case 'pending':
           filterText.value = 'Pendientes'
-          filteredRides = ridesStore.rides.filter(ride => ride.date >= today.value || ride.date === '')
+          filteredRides = ridesCopy.filter(ride => ride.date >= today.value || ride.date === '')
           break
         case 'old':
           filterText.value = 'Antiguas'
-          filteredRides = ridesStore.rides.filter(ride => ride.date < today.value && ride.date !== '')
+          filteredRides = ridesCopy.filter(ride => ride.date < today.value && ride.date !== '').reverse()
           break
         default:
           filterText.value = 'Pendientes'
@@ -129,6 +131,7 @@
 
     ridesStore.removeDateUser(date.id, userId)
   }
+
   function filterButtonClick() {
     if (rideFilter.value === 'pending') {
       rideFilter.value = 'old'
@@ -139,7 +142,7 @@
 </script>
 
 <template>
-  <div class="container mx-auto px-3">
+  <div class="container mx-auto">
     <div class="fixed-on-top">
       <button
         class="btn btn-submit btn-std"
@@ -158,6 +161,7 @@
       <button
         class="btn btn-selector btn-min"
         @click="filterButtonClick"
+        @touchend="touchendFilterButton"
       >
         {{ filterText }}
       </button>
@@ -184,7 +188,7 @@
   .fixed-on-top {
     position: fixed;
     top: 8.4rem;
-    right: 2rem;
+    right: 4.8rem;
     z-index: 1;
   }
 
@@ -203,8 +207,5 @@
     height: 100%;
     font-size: 2.4rem;
     line-height: 1;
-  }
-
-  .filter-button {
   }
 </style>

@@ -30,7 +30,7 @@
 </script>
 
 <template>
-  <div class="bg-white shadow-md max-w-7xl mx-auto p-4 user-view-grid">
+  <div class="bg-white shadow-md max-w-7xl mx-auto p-4 user-view-grid md:max-w-full md:shadow-none">
     <span
       v-if="fetching"
       class="text-cs-h4 text-color-std-high-tint md:col-span-2"

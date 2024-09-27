@@ -124,7 +124,7 @@
 </script>
 
 <template>
-  <div class="bg-white shadow-md max-w-screen-sm mx-auto">
+  <div class="bg-white shadow-md max-w-7xl mx-auto md:max-w-full md:shadow-none">
     <h1 class="text-4xl font-black ml-10 pt-10">{{ pageTitle }}</h1>
     <FormKit
       type="form"
@@ -174,7 +174,7 @@
       <FormKit
         label="Personalizar tu color"
         outer-class="sm:col-span-2"
-        inner-class="h-16"
+        inner-class="h-15 w-20 p-0"
         type="color"
         name="color"
         placeholder="Color de la abreviatura"
@@ -213,7 +213,4 @@
     padding: 2.5rem;
     width: 100%;
   }
-
-  /* @media (min-width: 768px) {
-  } */
 </style>
