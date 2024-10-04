@@ -1,12 +1,11 @@
 <script setup>
   import { ref, computed } from 'vue'
-  import { useRouter } from 'vue-router'
   import IconBars3 from '@/components/icons/IconBars3.vue'
   import IconClose from '@/components/icons/IconClose.vue'
   import { useAuthStore } from '@/stores/authStore'
 
+  const versionNumber = ref(import.meta.env.VITE_APP_VERSION)
   const authStore = useAuthStore()
-  const router = useRouter()
 
   const isOpen = ref(false)
   const userPage = computed(() => {
@@ -69,7 +68,7 @@
 
     <nav class="main-nav">
       <ul class="main-nav-list">
-        <h3 class="text-cs-h4 md:mt-4 hidden md:block">Versió 0.1</h3>
+        <h3 class="text-cs-h4 md:mt-4 hidden md:block">Versión {{ versionNumber }}</h3>
         <li>
           <a
             class="main-nav-link"

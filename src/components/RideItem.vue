@@ -113,7 +113,7 @@
 </script>
 
 <template>
-  <div class="text-16px p-2 border-b ride-layout border-color-std">
+  <div class="ride-layout text-16px p-2 border-b border-color-std">
     <div class="row-start-1 col-start-1 col-end-4">
       <span class="font-semibold mr-2">{{ ride.name }}</span>
       <IconMountain

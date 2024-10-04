@@ -95,6 +95,7 @@
       ridesStore.addRideDates(rideId, modDates)
     } else {
       ridesStore.updateRide(modRide)
+      console.log(modDates)
       ridesStore.updateRideDates(modRide.id, modDates)
     }
 
@@ -140,9 +141,11 @@
 
     if (numUsers > 0) {
       formData.dates[index].message = true
-      // formData.dates[index].confirm = false
+      timeoutID = setTimeout(() => {
+        formData.dates[index].message = false
+        forceRender()
+      }, 3000)
     } else {
-      // formData.dates[index].message = false
       formData.dates[index].confirm = true
       timeoutID = setTimeout(() => {
         formData.dates[index].confirm = false
@@ -223,6 +226,7 @@
                 :name="'date' + index"
                 placeholder="Fecha"
                 v-model.trim="formData.dates[index].date"
+                :disabled="date.users && date.users.length > 0"
               />
             </div>
 
@@ -236,18 +240,26 @@
               min="1"
               :validation-messages="{ required: 'La duración es obligatoria' }"
               v-model.trim="formData.dates[index].days"
+              :disabled="date.users && date.users.length > 0"
             />
 
             <div
               v-if="date.message"
               class="sm:col-start-1 sm:col-span-3"
             >
-              <p class="text-cs-std mt-5 sm:mt-0">No se puede borrar porque hay ciclistas apuntados</p>
+              <span class="inline-block text-[red] text-cs-std mr-4 mb-2">Hay ciclistas apuntados</span>
+              <button
+                class="btn btn-std btn-submit mt-6 sm:mt-0"
+                @click="confirmDeleteDate(index)"
+              >
+                Confirmar borrado
+              </button>
             </div>
             <div
               v-else-if="date.confirm"
               class="sm:col-start-1 sm:col-span-3"
             >
+              <!-- <span class="inline-block text-[red] text-cs-std mr-4 mb-2">Hay ciclistas apuntados</span> -->
               <button
                 class="btn btn-std btn-submit mt-6 sm:mt-0"
                 @click="confirmDeleteDate(index)"
@@ -261,7 +273,6 @@
                 size="3.2rem"
                 title="Borrar fecha"
                 @click="deleteDate(index)"
-                :stroke="date.users ? 'rgba(90,118,135,0.5)' : 'currentcolor'"
               >
               </IconDelete>
             </div>

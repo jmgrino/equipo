@@ -88,6 +88,9 @@
     date.id = dateId
     showDateFields(false)
     dates.push(date)
+    ridesStore.sortDates(dates)
+    ride.date = dates[0].date
+    ridesStore.updateRide(ride)
     formData.date = ''
     formData.days = 1
     forceRender()
@@ -118,6 +121,14 @@
     clearTimeout(timeoutID)
     await ridesStore.deleteDate(dates[index].id)
     dates.splice(index, 1)
+
+    if (dates.length > 0) {
+      ridesStore.sortDates(dates)
+      ride.date = dates[0].date
+    } else {
+      ride.date = ''
+    }
+    ridesStore.updateRide(ride)
 
     forceRender()
   }
@@ -226,7 +237,7 @@
           >
             <FormKit
               label="Fecha"
-              input-class="min-w-[15rem]"
+              input-class="min-w-[13rem]"
               type="date"
               :name="'date'"
               placeholder="Fecha"
@@ -236,7 +247,7 @@
           <FormKit
             v-if="showFormkit"
             label="Dias"
-            input-class="w-[5rem]"
+            input-class="w-[4rem]"
             type="number"
             :name="'days'"
             placeholder=""
@@ -245,22 +256,24 @@
             :validation-messages="{ required: 'La duración es obligatoria' }"
             v-model.trim="formData.days"
           />
-          <FormKit
-            v-if="showFormkit"
-            type="button"
-            label="Cancelar"
-            outer-class="cancel-button sm:justify-self-end"
-            wrapper-class="mt-6"
-            @click.prevent="showDateFields(false)"
-          />
+          <div class="flex gap-4 ml-2 md:col-start-1 col-end-3 md:justify-self-end">
+            <FormKit
+              v-if="showFormkit"
+              type="button"
+              label="Cancelar"
+              outer-class="cancel-button sm:justify-self-end"
+              wrapper-class="mt-6"
+              @click.prevent="showDateFields(false)"
+            />
 
-          <FormKit
-            v-if="showFormkit"
-            type="submit"
-            label="Añadir"
-            outer-class="submit-button"
-            wrapper-class="mt-6"
-          />
+            <FormKit
+              v-if="showFormkit"
+              type="submit"
+              label="Añadir"
+              outer-class="submit-button"
+              wrapper-class="mt-6"
+            />
+          </div>
         </FormKit>
 
         <div
@@ -299,7 +312,7 @@
     column-gap: 16px;
     row-gap: 8px;
     align-items: center;
-    grid-template-columns: max-content max-content max-content max-content;
+    grid-template-columns: max-content max-content max-content;
   }
   .icon-delete {
     cursor: pointer;

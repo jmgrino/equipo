@@ -5,6 +5,7 @@
   import { useRidesStore } from '@/stores/ridesStore'
   import RideItem from '@/components/RideItem.vue'
   import { useMinButton } from '@/composables/utilities/useMinButton'
+  import { useFormatDate } from '@/composables/utilities/useFormatDate'
 
   const router = useRouter()
 
@@ -23,6 +24,9 @@
   let usersList = ref([])
   let datesList = ref([])
   let filteredRides = ref([])
+
+  const { minButton } = useMinButton(topRef, 20)
+  const { formatMonth } = useFormatDate()
 
   onMounted(() => {
     rideFilter.value = localStorage.getItem('rideFilter') || ''
@@ -67,6 +71,18 @@
           break
       }
 
+      let oldMonthName = ''
+      filteredRides.forEach(ride => {
+        let monthName = formatMonth(ride.date)
+        if (monthName === oldMonthName) {
+          Object.assign(ride, { monthName: '' })
+        } else {
+          Object.assign(ride, { monthName: monthName })
+        }
+
+        oldMonthName = monthName
+      })
+
       return filteredRides
     })
 
@@ -105,8 +121,6 @@
 
     render.value = true
   })
-
-  const { minButton } = useMinButton(topRef, 20)
 
   function addRide() {
     router.push({ name: 'newRide' })
@@ -168,18 +182,31 @@
     </div>
 
     <div v-if="render">
-      <RideItem
-        v-for="ride in filteredRides"
-        :ride="ride"
-        :dates="datesList.filter(date => date.ride === ride.id)"
-        :currentShortname="currentShortname"
-        :userAdmin="userAdmin"
-        :usersList="usersList"
-        @view-ride-event="viewRide"
-        @edit-ride-event="editRide"
-        @add-shortname="addShortname"
-        @remove-shortname="removeShortname"
-      />
+      <div v-for="(ride, index) in filteredRides">
+        <h3
+          v-if="index === 0"
+          class="text-cs-h3 text-blue-500 border-b-2 border-color-std"
+        >
+          {{ ride.monthName }}
+        </h3>
+        <h3
+          v-if="index > 0 && ride.monthName"
+          class="text-cs-h3 text-blue-500 border-b-2 border-color-std pt-4"
+        >
+          {{ ride.monthName }}
+        </h3>
+        <RideItem
+          :ride="ride"
+          :dates="datesList.filter(date => date.ride === ride.id)"
+          :currentShortname="currentShortname"
+          :userAdmin="userAdmin"
+          :usersList="usersList"
+          @view-ride-event="viewRide"
+          @edit-ride-event="editRide"
+          @add-shortname="addShortname"
+          @remove-shortname="removeShortname"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -207,5 +234,11 @@
     height: 100%;
     font-size: 2.4rem;
     line-height: 1;
+  }
+
+  @media (max-width: 640px) {
+    .fixed-on-top {
+      right: 0.8rem;
+    }
   }
 </style>

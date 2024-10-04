@@ -158,13 +158,11 @@ export const useRidesStore = defineStore('ridesStore', () => {
 
   async function updateRideDates(rideId, dates) {
     try {
-      if (dates.length > 0) {
-        const q = query(collection(db, 'dates'), where('ride', '==', rideId), orderBy('date'))
-        const querySnapshot = await getDocs(q)
-        querySnapshot.forEach(async doc => {
-          await deleteDoc(doc.ref)
-        })
-      }
+      const q = query(collection(db, 'dates'), where('ride', '==', rideId), orderBy('date'))
+      const querySnapshot = await getDocs(q)
+      querySnapshot.forEach(async doc => {
+        await deleteDoc(doc.ref)
+      })
 
       await dates.forEach(async date => {
         const { id: baseId, ...baseDate } = date
