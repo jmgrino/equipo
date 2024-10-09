@@ -5,6 +5,7 @@
   import { useAuthStore } from '@/stores/authStore'
   // import { getValidationMessages } from '@formkit/validation'
   import IconDelete from '@/components/icons/IconDelete.vue'
+  import IconX from '@/components/icons/IconX.vue'
   import ModalOverlay from '@/components/utilities/ModalOverlay.vue'
 
   const ridesStore = useRidesStore()
@@ -95,7 +96,6 @@
       ridesStore.addRideDates(rideId, modDates)
     } else {
       ridesStore.updateRide(modRide)
-      console.log(modDates)
       ridesStore.updateRideDates(modRide.id, modDates)
     }
 
@@ -162,6 +162,15 @@
     forceRender()
   }
 
+  function cancelDate(index) {
+    if (formData.dates[index].canceled) {
+      formData.dates[index].canceled = false
+    } else {
+      formData.dates[index].canceled = true
+    }
+    forceRender()
+  }
+
   function dialogResult(result) {
     isModalOpen.value = false
     if (result) {
@@ -218,9 +227,12 @@
             v-for="(date, index) in formData.dates"
             :key="index"
           >
-            <div class="flex items-center col-start-1">
+            <div
+              class="flex items-center col-start-1"
+              :class="{ canceled: date.canceled === true }"
+            >
               <FormKit
-                label="Fecha"
+                :label="date.canceled ? 'Fecha cancelada' : 'Fecha'"
                 input-class="min-w-[15rem]"
                 type="date"
                 :name="'date' + index"
@@ -230,18 +242,20 @@
               />
             </div>
 
-            <FormKit
-              label="Dias"
-              input-class="w-[5rem]"
-              type="number"
-              :name="'days' + index"
-              placeholder="Dias de duracion la ruta"
-              validation="required"
-              min="1"
-              :validation-messages="{ required: 'La duración es obligatoria' }"
-              v-model.trim="formData.dates[index].days"
-              :disabled="date.users && date.users.length > 0"
-            />
+            <div :class="{ canceled: date.canceled === true }">
+              <FormKit
+                label="Dias"
+                input-class="w-[5rem]"
+                type="number"
+                :name="'days' + index"
+                placeholder="Dias de duracion la ruta"
+                validation="required"
+                min="1"
+                :validation-messages="{ required: 'La duración es obligatoria' }"
+                v-model.trim="formData.dates[index].days"
+                :disabled="date.users && date.users.length > 0"
+              />
+            </div>
 
             <div
               v-if="date.message"
@@ -267,14 +281,25 @@
                 Confirmar borrado
               </button>
             </div>
-            <div v-else>
+            <div
+              v-else
+              class="flex"
+              :class="{ canceled: date.canceled === true }"
+            >
               <IconDelete
-                class="icon-delete"
+                class="icon icon-delete"
                 size="3.2rem"
                 title="Borrar fecha"
                 @click="deleteDate(index)"
               >
               </IconDelete>
+              <IconX
+                class="icon icon-x"
+                size="3.2rem"
+                title="Cancelar fecha"
+                @click="cancelDate(index)"
+              >
+              </IconX>
             </div>
           </template>
         </template>
@@ -362,9 +387,13 @@
     align-items: center;
     justify-items: start;
   }
-  .icon-delete {
+  .icon {
     margin-top: 16px;
     cursor: pointer;
+  }
+
+  .icon:hover {
+    color: var(--color-std-high);
   }
 
   .btn-one,
@@ -374,6 +403,10 @@
     font-weight: 400;
     line-height: 1.3;
     padding: 0 0 4px 0;
+  }
+
+  .canceled {
+    color: rgba(90, 118, 135, 0.5);
   }
 
   @media (max-width: 640px) {

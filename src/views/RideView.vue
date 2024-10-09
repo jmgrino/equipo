@@ -188,8 +188,16 @@
             v-for="(date, index) in dates"
             :key="index"
           >
-            <span class="text-cs-h3 col-start-1">{{ formatDate(date.date) }}</span>
-            <span class="text-cs-h3">{{ date.days }} {{ date.days == 1 ? 'dia' : 'dias' }}</span>
+            <span
+              class="text-cs-h3 col-start-1"
+              :class="{ canceled: date.canceled === true }"
+              >{{ formatDate(date.date) }}</span
+            >
+            <span
+              class="text-cs-h3"
+              :class="{ canceled: date.canceled === true }"
+              >{{ date.days }} {{ date.days == 1 ? 'dia' : 'dias' }}</span
+            >
 
             <div
               v-if="date.message"
@@ -211,7 +219,7 @@
             <div v-else>
               <IconDelete
                 v-if="date.owner === authStore.user.id"
-                class="icon-delete"
+                class="icon"
                 size="3.2rem"
                 title="Borrar fecha"
                 @click="deleteDate(index)"
@@ -314,11 +322,18 @@
     align-items: center;
     grid-template-columns: max-content max-content max-content;
   }
-  .icon-delete {
+  .icon {
     cursor: pointer;
+  }
+  .icon:hover {
+    color: var(--color-std-high);
   }
   .pre-line {
     white-space: pre-line;
+  }
+
+  .canceled {
+    text-decoration: line-through;
   }
 
   @media (max-width: 640px) {

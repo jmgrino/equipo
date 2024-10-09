@@ -129,8 +129,8 @@
         v-for="(date, index) in localDates"
         :key="date.date"
       >
-        <p class="">{{ fDate(date.date) }}</p>
-        <p class="">{{ date.days }}</p>
+        <p :class="{ canceled: date.canceled === true }">{{ fDate(date.date) }}</p>
+        <p :class="{ canceled: date.canceled === true }">{{ date.days }}</p>
         <div>
           <UserBadge
             v-for="shortName in date.shortNames"
@@ -228,5 +228,9 @@
 
   .icon:hover {
     color: var(--color-std-high);
+  }
+
+  .canceled {
+    text-decoration: line-through;
   }
 </style>
