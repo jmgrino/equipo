@@ -128,7 +128,7 @@
     <h1 class="text-4xl font-black ml-10 pt-10">{{ pageTitle }}</h1>
     <FormKit
       type="form"
-      form-class="cs-form form-class"
+      form-class="form-class"
       :actions="false"
       @submit="submitHandler"
       @submit-invalid="showErrors"

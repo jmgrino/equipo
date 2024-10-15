@@ -103,6 +103,21 @@ input.formkit-input[type=color]::-webkit-color-swatch {
     border: none;
 }
 
+/* Files input */
+
+.formkit-no-files {
+    display: none;
+}
+
+.formkit-file-list {
+    display: none;
+}
+
+.formkit-outer[data-type="file"] .formkit-inner {
+    border-color: var(--color-std-high);
+    height: 31px;
+}
+
 /* Buttons */
 .submit-button,
 .cancel-button {

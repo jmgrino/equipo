@@ -4,6 +4,7 @@
   import { useAuthStore } from '@/stores/authStore'
   import { useRouter, useRoute } from 'vue-router'
   import IconDelete from '@/components/icons/IconDelete.vue'
+  import IconDownload from '@/components/icons/IconDownload.vue'
 
   // import { getValidationMessages } from '@formkit/validation'
 
@@ -12,9 +13,9 @@
   const router = useRouter()
   const route = useRoute()
 
-  const pageTitle = ref('')
   let ride = reactive({})
   let dates = reactive({})
+  let tracks = reactive({})
   const createdBy = ref({})
 
   const fetching = ref(false)
@@ -40,10 +41,12 @@
 
     ride = await ridesStore.getRide(id)
     dates = await ridesStore.getRideDates(id)
+    tracks = ridesStore.tracks.filter(track => track.ride === ride.id)
+    // tracks = ridesStore.tracks
+
     createdBy.value = await authStore.getUser(ride.owner)
 
     fetching.value = false
-    pageTitle.value = ride.name
 
     routeOnwer.value = getRouteOwner()
   }
@@ -69,7 +72,7 @@
     }
   }
 
-  function editUser() {
+  function editRide() {
     router.push({ name: 'editRide', params: { id: ride.id } })
   }
 
@@ -153,7 +156,7 @@
         >Esperando datos...</span
       >
       <span
-        v-else="fetching"
+        v-else
         class="text-cs-h4 text-color-std sm:row-start-2"
         >Ruta creada por {{ createdBy.name }}</span
       >
@@ -167,7 +170,7 @@
         <button
           v-if="routeOnwer"
           class="btn btn-std btn-submit"
-          @click="editUser"
+          @click="editRide"
         >
           Editar
         </button>
@@ -182,7 +185,7 @@
       <span class="text-cs-h3">Tipo:</span>
       <span class="text-cs-h3">{{ ride.type }}</span>
       <span class="text-cs-h3">Fechas:</span>
-      <div class="dates-grid cs-form">
+      <div class="dates-grid">
         <template v-if="renderDates">
           <template
             v-for="(date, index) in dates"
@@ -232,7 +235,7 @@
 
         <FormKit
           type="form"
-          form-class="col-start-1 col-end-4 add-date-grid cs-form"
+          form-class="col-start-1 col-end-4 add-date-grid"
           :actions="false"
           @submit="addDate"
           validation-visibility="submit"
@@ -297,7 +300,23 @@
         </div>
       </div>
       <span class="text-cs-h3">Notas:</span>
-      <span class="text-cs-h3 pre-line">{{ ride.note }}</span>
+      <span class="text-cs-h3 notes">{{ ride.note }}</span>
+      <template v-if="tracks.length > 0">
+        <span class="text-cs-h3 mt-4">Tracks:</span>
+        <div class="col-start-2 tracks-grid mt-4">
+          <template v-for="track in tracks">
+            <span class="text-cs-h3">{{ track.name }}</span>
+            <a :href="track.url">
+              <IconDownload
+                class="icon"
+                size="3.2rem"
+                title="Descargar track"
+              >
+              </IconDownload>
+            </a>
+          </template>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -322,16 +341,25 @@
     align-items: center;
     grid-template-columns: max-content max-content max-content;
   }
+  .tracks-grid {
+    /* width: 100px; */
+    display: grid;
+    column-gap: 16px;
+    row-gap: 8px;
+    align-items: center;
+    grid-template-columns: minmax(min-content, max-content) min-content;
+  }
   .icon {
     cursor: pointer;
   }
   .icon:hover {
     color: var(--color-std-high);
   }
-  .pre-line {
+  .notes {
     white-space: pre-line;
+    border: 1px solid #d1d5db;
+    padding: 8px;
   }
-
   .canceled {
     text-decoration: line-through;
   }

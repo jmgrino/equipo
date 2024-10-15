@@ -55,7 +55,7 @@
     <h1 class="text-4xl font-black ml-10 pt-10">{{ pageTitle }}</h1>
     <FormKit
       type="form"
-      form-class="cs-form mt-10 p-10 w-full login-grid"
+      form-class="mt-10 p-10 w-full login-grid"
       :actions="false"
       @submit="submitHandler"
       @submit-invalid="showErrors"

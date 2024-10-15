@@ -15,6 +15,7 @@
     authStore.init()
     ridesStore.getRides()
     ridesStore.getDates()
+    ridesStore.getTracks()
     ridesStore.getUsers()
 
     const validUser = await authStore.checkValidUserData()

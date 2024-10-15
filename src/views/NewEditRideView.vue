@@ -33,6 +33,7 @@
   const errorMessage = ref('')
   // errorMessage.value = 'No se pudo enviar, revisa los mensajes'
   const isNew = ref(false)
+  const fetching = ref(false)
   let timeoutID
 
   const isModalOpen = ref(false)
@@ -60,6 +61,7 @@
   }
 
   async function getRide(id) {
+    fetching.value = true
     const ride = await ridesStore.getRide(id)
     const dates = await ridesStore.getRideDates(id)
 
@@ -68,6 +70,7 @@
 
     Object.assign(formData, { dates: datesData })
     pageTitle.value = ride.name
+    fetching.value = false
   }
 
   async function submitHandler() {
@@ -179,6 +182,10 @@
     }
   }
 
+  function manageTracks() {
+    router.push({ name: 'tracks', params: { id: formData.id } })
+  }
+
   const forceRender = async () => {
     renderDates.value = false
     await nextTick()
@@ -188,12 +195,24 @@
 
 <template>
   <div class="bg-white shadow-md max-w-7xl mx-auto md:max-w-full md:shadow-none">
-    <div class="flex justify-between items-center pt-5 gap-x-4">
-      <h1 class="text-4xl font-black ml-10">{{ pageTitle }}</h1>
+    <div class="flex justify-between items-center pt-5 px-10 gap-x-4">
+      <template v-if="fetching">
+        <h2 class="text-2xl">Esperando datos...</h2>
+      </template>
+      <template v-else>
+        <h2 class="text-4xl font-black">{{ pageTitle }}</h2>
+        <button
+          v-show="!isNew"
+          class="btn btn-std btn-submit mb-4"
+          @click.prevent="manageTracks"
+        >
+          Tracks
+        </button>
+      </template>
     </div>
     <FormKit
       type="form"
-      form-class="cs-form mt-10 p-10 w-full md:p-5"
+      form-class="mt-10 p-10 w-full md:p-5"
       :actions="false"
       @submit="submitHandler"
       @submit-invalid="showErrors"

@@ -21,9 +21,11 @@ import {
 export const useRidesStore = defineStore('ridesStore', () => {
   let rides = ref([])
   let dates = ref([])
+  let tracks = ref([])
   let users = ref([])
   let validRides = ref(false)
   let validDates = ref(false)
+  let validTracks = ref(false)
   let validUsers = ref(false)
   let datesSeq = ref(0)
 
@@ -31,6 +33,21 @@ export const useRidesStore = defineStore('ridesStore', () => {
     let iter = 0
     const maxIter = 100
     while (iter < maxIter && (!validRides.value || !validDates.value || !validUsers.value)) {
+      await wait(50)
+      iter++
+    }
+
+    if (iter === maxIter) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  async function checkValidTracks() {
+    let iter = 0
+    const maxIter = 100
+    while (iter < maxIter && !validTracks.value) {
       await wait(50)
       iter++
     }
@@ -79,6 +96,24 @@ export const useRidesStore = defineStore('ridesStore', () => {
       sortDates(dates.value)
       validDates.value = true
       datesSeq.value++
+    })
+  }
+
+  function getTracks() {
+    const q = collection(db, 'tracks')
+    const unsubTracks = onSnapshot(q, querySnapshot => {
+      tracks.value = []
+      querySnapshot.forEach(doc => {
+        const track = {
+          id: doc.id,
+          ...doc.data(),
+        }
+        tracks.value.push(track)
+      })
+
+      // sortDates(dates.value)
+      validTracks.value = true
+      // tracksSeq.value++
     })
   }
 
@@ -239,6 +274,20 @@ export const useRidesStore = defineStore('ridesStore', () => {
     })
   }
 
+  async function addTrack(track) {
+    const docRef = await addDoc(collection(db, 'tracks'), track)
+    return docRef.id
+  }
+
+  async function deleteTrack(trackId) {
+    try {
+      const trackRef = doc(db, 'tracks', trackId)
+      await deleteDoc(trackRef)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   function deepCopy(object) {
     let newObject
     try {
@@ -257,9 +306,11 @@ export const useRidesStore = defineStore('ridesStore', () => {
     rides,
     dates,
     users,
+    tracks,
     datesSeq,
     getRides,
     getDates,
+    getTracks,
     getUsers,
     validData,
     getRide,
@@ -273,6 +324,9 @@ export const useRidesStore = defineStore('ridesStore', () => {
     deleteDate,
     addDateUser,
     removeDateUser,
+    checkValidTracks,
+    addTrack,
+    deleteTrack,
     deepCopy,
     sortDates,
   }

@@ -35,6 +35,11 @@ const router = createRouter({
       component: () => import('../views/NewEditRideView.vue'),
     },
     {
+      path: '/rides/edit/:id/track',
+      name: 'tracks',
+      component: () => import('../views/TracksView.vue'),
+    },
+    {
       path: '/login',
       name: 'login',
       component: loginView,
