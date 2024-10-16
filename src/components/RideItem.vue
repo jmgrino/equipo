@@ -70,12 +70,25 @@
     if (date === '') {
       fDate = '???'
     } else {
-      const dateYear = date.substr(0, 4)
+      const dateYear = date.substr(2, 2)
       const dateMonth = date.substr(5, 2)
       const dateDay = date.substr(8, 2)
       fDate = dateDay + '/' + dateMonth + '/' + dateYear
     }
     return fDate
+  }
+
+  const fDay = date => {
+    const weekday = ['D', 'L', 'M', 'W', 'J', 'V', 'S']
+
+    let fDay = ''
+    if (date === '') {
+      fDay = '?'
+    } else {
+      const d = new Date(date)
+      fDay = weekday[d.getDay()]
+    }
+    return fDay
   }
 
   function addShortname(date, user = null) {
@@ -129,6 +142,9 @@
         v-for="(date, index) in localDates"
         :key="date.date"
       >
+        <p :class="{ canceled: date.canceled === true }">
+          {{ fDay(date.date) }}
+        </p>
         <p :class="{ canceled: date.canceled === true }">{{ fDate(date.date) }}</p>
         <p :class="{ canceled: date.canceled === true }">{{ date.days }}</p>
         <div>
@@ -209,13 +225,13 @@
 
   .dates-container {
     display: grid;
-    grid-template-columns: 9rem 2rem 1fr;
+    grid-template-columns: 1.5rem 7rem 2rem 1fr;
     column-gap: 4px;
   }
 
   .button-container {
     grid-row: 1 / -1;
-    grid-column: 4 / 5;
+    grid-column: 2 / 3;
     align-self: center;
     display: flex;
     column-gap: 8px;
