@@ -59,15 +59,15 @@
       switch (rideFilter.value) {
         case 'pending':
           filterText.value = 'Pendientes'
-          filteredRides = ridesCopy.filter(ride => ride.date >= today.value || ride.date === '')
+          filteredRides = ridesCopy.filter(ride => ride.lastDate >= today.value || ride.lastDate === '')
           break
         case 'old':
           filterText.value = 'Antiguas'
-          filteredRides = ridesCopy.filter(ride => ride.date < today.value && ride.date !== '').reverse()
+          filteredRides = ridesCopy.filter(ride => ride.lastDate < today.value && ride.lastDate !== '').reverse()
           break
         default:
           filterText.value = 'Pendientes'
-          filteredRides = ridesStore.rides.filter(ride => ride.date >= today.value || ride.date === '')
+          filteredRides = ridesStore.rides.filter(ride => ride.lastDate >= today.value || ride.lastDate === '')
           break
       }
 

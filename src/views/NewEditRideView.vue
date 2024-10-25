@@ -85,12 +85,16 @@
 
     const { dates: modDates, ...modRide } = formData
 
-    modRide.date = ''
-    if (modDates) {
-      if (modDates.length > 0) {
-        ridesStore.sortDates(modDates)
-        modRide.date = modDates[0].date
-      }
+    ridesStore.sortDates(modDates)
+
+    const datesWithValidDate = modDates.filter(date => date.date !== '' && !date.canceled)
+
+    if (datesWithValidDate.length > 0) {
+      modRide.date = datesWithValidDate[0].date
+      modRide.lastDate = datesWithValidDate.reverse()[0].date
+    } else {
+      modRide.date = ''
+      modRide.lastDate = ''
     }
 
     if (isNew.value) {

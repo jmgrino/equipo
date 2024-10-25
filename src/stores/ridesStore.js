@@ -262,8 +262,8 @@ export const useRidesStore = defineStore('ridesStore', () => {
     }
   }
 
-  function sortDates(rides) {
-    rides.sort(function (a, b) {
+  function sortDates(items) {
+    items.sort(function (a, b) {
       if (a.date === '') {
         return 1
       } else if (b.date === '') {

@@ -92,8 +92,19 @@
     showDateFields(false)
     dates.push(date)
     ridesStore.sortDates(dates)
-    ride.date = dates[0].date
+
+    const datesWithValidDate = dates.filter(date => date.date !== '' && !date.canceled)
+
+    if (datesWithValidDate.length > 0) {
+      ride.date = datesWithValidDate[0].date
+      ride.lastDate = datesWithValidDate.reverse()[0].date
+    } else {
+      ride.date = ''
+      ride.lastDate = ''
+    }
+
     ridesStore.updateRide(ride)
+
     formData.date = ''
     formData.days = 1
     forceRender()
@@ -124,13 +135,18 @@
     clearTimeout(timeoutID)
     await ridesStore.deleteDate(dates[index].id)
     dates.splice(index, 1)
+    ridesStore.sortDates(dates)
 
-    if (dates.length > 0) {
-      ridesStore.sortDates(dates)
-      ride.date = dates[0].date
+    const datesWithValidDate = dates.filter(date => date.date !== '' && !date.canceled)
+
+    if (datesWithValidDate.length > 0) {
+      ride.date = datesWithValidDate[0].date
+      ride.lastDate = datesWithValidDate.reverse()[0].date
     } else {
       ride.date = ''
+      ride.lastDate = ''
     }
+
     ridesStore.updateRide(ride)
 
     forceRender()
