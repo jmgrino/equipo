@@ -35,6 +35,14 @@
 }
 
 /* ===================== */
+/* Fonts */
+/* ===================== */
+@font-face {
+  font-family: cousine;
+  src: url(../fonts/Cousine-Regular.ttf);
+}
+
+/* ===================== */
 /* Headings */
 /* ===================== */
 

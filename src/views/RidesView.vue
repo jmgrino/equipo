@@ -16,7 +16,7 @@
   const render = ref(false)
   const currentUser = ref('')
   const currentShortname = ref('')
-  const userAdmin = ref('')
+  const userAdmin = ref(false)
   const userIncluded = ref(false)
   const filterText = ref('Pendientes')
   const rideFilter = ref('pending')

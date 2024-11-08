@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, nextTick } from 'vue'
+  import { ref, computed, nextTick, useTemplateRef, onMounted } from 'vue'
   import IconEye from '@/components/icons/IconEye.vue'
   import IconPlus from '@/components/icons/IconPlus.vue'
   import IconMinus from '@/components/icons/IconMinus.vue'
@@ -29,6 +29,13 @@
       required: true,
     },
   })
+
+  const datesRef = useTemplateRef('datesRef')
+
+  onMounted(() => console.log(datesRef.value))
+
+  // dateRef.value.style.color = 'red'
+  console.log(datesRef.value)
 
   const emit = defineEmits(['viewRideEvent', 'addShortname', 'removeShortname'])
 
@@ -68,7 +75,7 @@
   const fDate = date => {
     let fDate = ''
     if (date === '') {
-      fDate = '???'
+      fDate = '???' + String.fromCharCode(160).repeat(5)
     } else {
       const dateYear = date.substr(2, 2)
       const dateMonth = date.substr(5, 2)
@@ -127,7 +134,7 @@
 
 <template>
   <div class="ride-layout text-16px p-2 border-b border-color-std">
-    <div class="row-start-1 col-start-1 col-end-4">
+    <div class="row-start-1 col-start-1">
       <span class="font-semibold mr-2">{{ ride.name }}</span>
       <IconMountain
         v-if="ride.type === 'BTT'"
@@ -141,13 +148,18 @@
       <template
         v-for="(date, index) in localDates"
         :key="date.date"
+        ref="datesRef"
       >
-        <p :class="{ canceled: date.canceled === true }">
+        <p :class="{ canceled: date.canceled === true }">{{ fDay(date.date) }} {{ fDate(date.date) }} {{ date.days }}&nbsp;</p>
+        <!-- <p :class="{ canceled: date.canceled === true }">
           {{ fDay(date.date) }}
         </p>
-        <p :class="{ canceled: date.canceled === true }">{{ fDate(date.date) }}</p>
-        <p :class="{ canceled: date.canceled === true }">{{ date.days }}</p>
-        <div>
+        <p :class="{ canceled: date.canceled === true }">
+          {{ fDate(date.date) }}
+        </p>
+        <p :class="{ canceled: date.canceled === true }">{{ date.days }}&nbsp;</p> -->
+
+        <div class="flex items-center flex-wrap gap-x-1 gap-y-3">
           <UserBadge
             v-for="shortName in date.shortNames"
             :shortName="shortName"
@@ -223,9 +235,20 @@
     column-gap: 4px;
   }
 
-  .dates-container {
+  .dates-grid {
     display: grid;
-    grid-template-columns: 1.5rem 7rem 2rem 1fr;
+    grid-template-columns: 16px 1fr;
+    column-gap: 8px;
+  }
+
+  .dates-container {
+    /* display: flex;
+    align-items: center;
+    flex-flow: row wrap;
+    column-gap: 4px;
+    font-family: monospace; */
+    display: grid;
+    grid-template-columns: minmax(10rem, max-content) 1fr;
     column-gap: 4px;
   }
 

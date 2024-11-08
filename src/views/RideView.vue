@@ -158,14 +158,18 @@
     renderDates.value = true
   }
 
+  function capitalize(s) {
+    return String(s[0]).toUpperCase() + String(s).slice(1)
+  }
+
   function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 </script>
 
 <template>
-  <div class="bg-white shadow-md max-w-7xl mx-auto p-4 md:max-w-full md:shadow-none">
-    <div class="user-view-grid">
+  <div class="bg-white shadow-md max-w-7xl mx-auto p-4 sm:max-w-full sm:shadow-none">
+    <div class="header-grid">
       <span
         v-if="fetching"
         class="text-cs-h4 text-color-std-high-tint sm:row-start-2"
@@ -176,7 +180,7 @@
         class="text-cs-h4 text-color-std sm:row-start-2"
         >Ruta creada por {{ createdBy.name }}</span
       >
-      <div class="justify-self-end flex gap-5 sm:col-span-2">
+      <div class="justify-self-end flex gap-5 sm:row-start-1">
         <button
           class="btn btn-std btn-cancel"
           @click="router.push({ name: 'rides' })"
@@ -196,11 +200,11 @@
       v-if="!fetching"
       class="user-view-grid mt-6"
     >
-      <span class="text-cs-h3">Nombre:</span>
-      <span class="text-cs-h3">{{ ride.name }}</span>
-      <span class="text-cs-h3">Tipo:</span>
-      <span class="text-cs-h3">{{ ride.type }}</span>
-      <span class="text-cs-h3">Fechas:</span>
+      <span class="label text-cs-h3">Nombre:</span>
+      <span class="text-cs-h3 sm:font-bold">{{ ride.name }}</span>
+      <span class="label text-cs-h3">Tipo:</span>
+      <span class="text-cs-h3">- {{ capitalize(ride.type) }}</span>
+      <span class="text-cs-h3 sm:underline sm:underline-offset-2">Fechas:</span>
       <div class="dates-grid">
         <template v-if="renderDates">
           <template
@@ -283,7 +287,7 @@
             :validation-messages="{ required: 'La duración es obligatoria' }"
             v-model.trim="formData.days"
           />
-          <div class="flex gap-4 ml-2 md:col-start-1 col-end-3 md:justify-self-end">
+          <div class="flex gap-4 ml-2 sm:col-start-1 col-end-3 sm:justify-self-end">
             <FormKit
               v-if="showFormkit"
               type="button"
@@ -315,14 +319,26 @@
           </button>
         </div>
       </div>
-      <span class="text-cs-h3">Notas:</span>
-      <span class="text-cs-h3 notes">{{ ride.note }}</span>
+      <span
+        v-if="ride.note"
+        class="text-cs-h3"
+        >Notas:</span
+      >
+      <span
+        v-if="ride.note"
+        class="text-cs-h3 notes"
+        >{{ ride.note }}</span
+      >
       <template v-if="tracks.length > 0">
-        <span class="text-cs-h3 mt-4">Tracks:</span>
-        <div class="col-start-2 tracks-grid mt-4">
+        <span class="text-cs-h3 mt-4 sm:underline sm:underline-offset-2">Tracks:</span>
+        <div class="col-start-2 sm:col-start-1 tracks-grid mt-4 sm:mt-0">
           <template v-for="track in tracks">
+            <span class="text-cs-h3 self-start">-</span>
             <span class="text-cs-h3">{{ track.name }}</span>
-            <a :href="track.url">
+            <a
+              :href="track.url"
+              class="self-end pb-2"
+            >
               <IconDownload
                 class="icon"
                 size="3.2rem"
@@ -342,7 +358,14 @@
     display: grid;
     column-gap: 16px;
     row-gap: 8px;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: minmax(min-content, max-content) 1fr;
+  }
+  .header-grid {
+    display: grid;
+    column-gap: 16px;
+    row-gap: 8px;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: min-content min-content;
   }
   .dates-grid {
     display: grid;
@@ -363,7 +386,7 @@
     column-gap: 16px;
     row-gap: 8px;
     align-items: center;
-    grid-template-columns: minmax(min-content, max-content) min-content;
+    grid-template-columns: min-content 1fr min-content;
   }
   .icon {
     cursor: pointer;
@@ -380,9 +403,21 @@
     text-decoration: line-through;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 480px) {
+    .label {
+      display: none;
+    }
+    .user-view-grid {
+      grid-template-columns: 1fr;
+      /* justify-items: stretch;
+      justify-content: stretch; */
+    }
+    .header-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: min-content min-content;
+    }
     .add-date-grid {
-      grid-template-columns: max-content max-content;
+      grid-template-columns: min-content max-content;
     }
   }
 </style>
