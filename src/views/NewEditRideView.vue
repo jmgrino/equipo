@@ -68,6 +68,13 @@
     formData = ridesStore.deepCopy(ride)
     const datesData = ridesStore.deepCopy(dates)
 
+    datesData.forEach(date => {
+      if (date.noDay === undefined) {
+        console.log('undefined')
+        date.noDay = false
+      }
+    })
+
     Object.assign(formData, { dates: datesData })
     pageTitle.value = ride.name
     fetching.value = false
@@ -136,6 +143,7 @@
       id: 'new',
       ride: formData.id,
       owner: authStore.user.id,
+      noDay: false,
     })
     forceRender()
   }
@@ -227,7 +235,7 @@
       <div class="user-view-grid">
         <FormKit
           label="Nombre"
-          outer-class="col-start-1 col-end-4 w-full"
+          outer-class="col-span-full"
           type="text"
           name="name"
           placeholder="Nombre de la ruta"
@@ -238,7 +246,7 @@
 
         <FormKit
           label="Tipo de ruta"
-          outer-class="col-start-1 col-end-4 w-[16.5rem]"
+          outer-class="col-span-full w-[16.5rem]"
           type="select"
           name="type"
           :options="rideType"
@@ -268,7 +276,8 @@
             <div :class="{ canceled: date.canceled === true }">
               <FormKit
                 label="Dias"
-                input-class="w-[5rem]"
+                inner-class="w-[5rem]"
+                input-class="w-[4rem]"
                 type="number"
                 :name="'days' + index"
                 placeholder="Dias de duracion la ruta"
@@ -280,13 +289,24 @@
               />
             </div>
 
+            <div :class="{ canceled: date.canceled === true }">
+              <FormKit
+                label="Mensual"
+                input-class="w-[5rem]"
+                type="checkbox"
+                :name="'noday' + index"
+                v-model.trim="formData.dates[index].noDay"
+                :disabled="date.users && date.users.length > 0"
+              />
+            </div>
+
             <div
               v-if="date.message"
-              class="sm:col-start-1 sm:col-span-3"
+              class="sm:col-span-full"
             >
               <span class="inline-block text-[red] text-cs-std mr-4 mb-2">Hay ciclistas apuntados</span>
               <button
-                class="btn btn-std btn-submit mt-6 sm:mt-0"
+                class="btn btn-std btn-submit mt-6 sm:mt-0 sm:col-start-1"
                 @click="confirmDeleteDate(index)"
               >
                 Confirmar borrado
@@ -294,7 +314,7 @@
             </div>
             <div
               v-else-if="date.confirm"
-              class="sm:col-start-1 sm:col-span-3"
+              class="sm:col-span-full"
             >
               <!-- <span class="inline-block text-[red] text-cs-std mr-4 mb-2">Hay ciclistas apuntados</span> -->
               <button
@@ -306,7 +326,7 @@
             </div>
             <div
               v-else
-              class="flex"
+              class="flex sm:col-start-3"
               :class="{ canceled: date.canceled === true }"
             >
               <IconDelete
@@ -324,9 +344,10 @@
               >
               </IconX>
             </div>
+            <div class="col-span-full border-b-2"></div>
           </template>
         </template>
-        <div class="col-start-1 col-end-4">
+        <div class="col-span-full">
           <button
             class="btn btn-std btn-submit mb-4"
             @click.prevent="addDate"
@@ -337,7 +358,7 @@
 
         <FormKit
           label="Notas"
-          outer-class="col-span-3"
+          outer-class="col-span-full"
           type="textarea"
           name="note"
           placeholder="Notas"
@@ -399,7 +420,7 @@
     display: grid;
     column-gap: 16px;
     row-gap: 8px;
-    grid-template-columns: max-content max-content 1fr;
+    grid-template-columns: max-content max-content min-content 1fr;
     align-items: center;
   }
   .buttons-grid {
@@ -433,10 +454,18 @@
   }
 
   @media (max-width: 640px) {
+    .user-view-grid {
+      grid-template-columns: max-content max-content 1fr;
+      align-items: center;
+    }
     .buttons-grid {
       grid-template-columns: 1fr;
       grid-template-rows: repeat(3, min-content);
       row-gap: 8px;
+    }
+    .icon {
+      margin-top: 8px;
+      margin-bottom: 8px;
     }
   }
 </style>

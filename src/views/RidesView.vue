@@ -6,6 +6,13 @@
   import RideItem from '@/components/RideItem.vue'
   import { useMinButton } from '@/composables/utilities/useMinButton'
   import { useFormatDate } from '@/composables/utilities/useFormatDate'
+  import IconCog from '@/components/icons/IconCog.vue'
+  import IconPlus from '@/components/icons/IconPlus.vue'
+  import IconMinus from '@/components/icons/IconMinus.vue'
+
+  const INITIAL_DATE_WIDTH = 10
+  const MIN_DATE_WIDTH = 9
+  const MAX_DATE_WIDTH = 24
 
   const router = useRouter()
 
@@ -20,6 +27,8 @@
   const userIncluded = ref(false)
   const filterText = ref('Pendientes')
   const rideFilter = ref('pending')
+  const dateWidth = ref(INITIAL_DATE_WIDTH)
+  const shortDate = ref(false)
 
   let usersList = ref([])
   let datesList = ref([])
@@ -48,6 +57,16 @@
   })
 
   ridesStore.validData().then(() => {
+    currentUser.value = authStore.user.id
+    currentShortname.value = authStore.user.shortName
+    if (authStore.user.dateWidth) dateWidth.value = authStore.user.dateWidth
+    if (authStore.user.shortDate) shortDate.value = authStore.user.shortDate
+    if (authStore.user.admin) {
+      userAdmin.value = true
+    } else {
+      userAdmin.value = false
+    }
+
     usersList = computed(() => {
       return ridesStore.deepCopy(ridesStore.users)
     })
@@ -67,7 +86,7 @@
           break
         default:
           filterText.value = 'Pendientes'
-          filteredRides = ridesStore.rides.filter(ride => ride.lastDate >= today.value || ride.lastDate === '')
+          filteredRides = ridesCopy.filter(ride => ride.lastDate >= today.value || ride.lastDate === '')
           break
       }
 
@@ -88,14 +107,6 @@
 
     datesList = computed(() => {
       const dates = ridesStore.deepCopy(ridesStore.dates)
-
-      currentUser.value = authStore.user.id
-      currentShortname.value = authStore.user.shortName
-      if (authStore.user.admin) {
-        userAdmin.value = true
-      } else {
-        userAdmin.value = false
-      }
 
       dates.forEach(date => {
         userIncluded.value = false
@@ -121,6 +132,11 @@
 
     render.value = true
   })
+
+  function filterDates(rideId) {
+    return ridesStore.deepCopy(datesList.value.filter(date => date.ride === rideId))
+    // datesList.filter(date => date.ride === ride.id)
+  }
 
   function addRide() {
     router.push({ name: 'newRide' })
@@ -153,6 +169,38 @@
       rideFilter.value = 'pending'
     }
   }
+
+  function addSpace() {
+    if (dateWidth.value < MAX_DATE_WIDTH) dateWidth.value = dateWidth.value + 1
+  }
+
+  function removeSpace() {
+    if (dateWidth.value > MIN_DATE_WIDTH) dateWidth.value = dateWidth.value - 1
+  }
+
+  async function applyFormat() {
+    const userData = {
+      dateWidth: dateWidth.value,
+      shortDate: shortDate.value,
+    }
+    await authStore.updateUser(currentUser.value, userData)
+
+    authStore.showModSpace = false
+  }
+
+  function cancelFormat() {
+    authStore.showModSpace = false
+    if (authStore.user.dateWidth) {
+      dateWidth.value = authStore.user.dateWidth
+    } else {
+      dateWidth.value = INITIAL_DATE_WIDTH
+    }
+    if (authStore.user.shortDate) {
+      shortDate.value = authStore.user.shortDate
+    } else {
+      shortDate.value = false
+    }
+  }
 </script>
 
 <template>
@@ -175,9 +223,49 @@
       <button
         class="btn btn-selector btn-min"
         @click="filterButtonClick"
-        @touchend="touchendFilterButton"
       >
         {{ filterText }}
+      </button>
+    </div>
+
+    <div
+      v-if="authStore.showModSpace"
+      class="flex items-center gap-x-2"
+    >
+      <IconMinus
+        class="icon"
+        size="4.0rem"
+        title="Desapuntarme de la ruta"
+        @click="removeSpace"
+      />
+      <div class="text-cs-h2">{{ dateWidth }}</div>
+      <IconPlus
+        class="icon"
+        size="4.0rem"
+        title="Apuntarme a la ruta"
+        @click="addSpace"
+      />
+      <input
+        type="checkbox"
+        class="ml-4"
+        v-model="shortDate"
+      /><span class="text-cs-h4">Formato de fecha reducido</span>
+    </div>
+    <div
+      v-if="authStore.showModSpace"
+      class="flex items-center gap-x-2 my-4 justify-end"
+    >
+      <button
+        class="btn btn-cancel btn-min px-2 ml-4"
+        @click="cancelFormat"
+      >
+        Cancelar
+      </button>
+      <button
+        class="btn btn-submit btn-min px-2 ml-4"
+        @click="applyFormat"
+      >
+        Guardar formato
       </button>
     </div>
 
@@ -197,10 +285,12 @@
         </h3>
         <RideItem
           :ride="ride"
-          :dates="datesList.filter(date => date.ride === ride.id)"
+          :dates="filterDates(ride.id)"
           :currentShortname="currentShortname"
           :userAdmin="userAdmin"
           :usersList="usersList"
+          :dateWidth="dateWidth"
+          :shortDate="shortDate"
           @view-ride-event="viewRide"
           @edit-ride-event="editRide"
           @add-shortname="addShortname"
@@ -234,6 +324,15 @@
     height: 100%;
     font-size: 2.4rem;
     line-height: 1;
+  }
+
+  .icon {
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .icon:hover {
+    color: var(--color-std-high);
   }
 
   @media (max-width: 640px) {

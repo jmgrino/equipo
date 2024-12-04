@@ -1,5 +1,5 @@
 <script setup>
-  import { reactive, ref, nextTick } from 'vue'
+  import { reactive, ref, nextTick, onMounted, onUpdated, useTemplateRef } from 'vue'
   import { useRidesStore } from '@/stores/ridesStore'
   import { useAuthStore } from '@/stores/authStore'
   import { useRouter, useRoute } from 'vue-router'
@@ -23,6 +23,11 @@
   const renderDates = ref(true)
   const showFormkit = ref(false)
   const errorMessage = ref('')
+
+  const datesRef = useTemplateRef('datesRef')
+  const localShortDate = ref(false)
+  const isMobile = ref(false)
+
   let timeoutID
 
   const formData = reactive({
@@ -33,6 +38,29 @@
   // const isMobile = computed(() => {
   //   return screen.width <= 760
   // })
+
+  onMounted(() => {
+    isMobile.value = screen.width <= 480
+  })
+
+  onUpdated(() => {
+    if (datesRef.value) {
+      if (isMobile.value) {
+        localShortDate.value = authStore.user.shortDate
+      } else {
+        localShortDate.value = false
+      }
+      datesRef.value.forEach(dateRef => {
+        const datesDiv = dateRef
+        const newWidth = authStore.user.dateWidth + 10
+        if (isMobile.value && authStore.user.dateWidth > 0) {
+          datesDiv.style = `grid-template-columns: minmax(${newWidth}rem, max-content) 1fr`
+        } else {
+          datesDiv.style = `grid-template-columns: minmax(20rem, max-content) 1fr`
+        }
+      })
+    }
+  })
 
   getRide(route.params.id)
 
@@ -51,17 +79,53 @@
     routeOnwer.value = getRouteOwner()
   }
 
-  const formatDate = date => {
+  // const formatDate = date => {
+  //   let fDate = ''
+  //   if (!date) {
+  //     fDate = '???'
+  //   } else {
+  //     const dateYear = date.substr(0, 4)
+  //     const dateMonth = date.substr(5, 2)
+  //     const dateDay = date.substr(8, 2)
+  //     fDate = dateDay + '/' + dateMonth + '/' + dateYear
+  //   }
+  //   return fDate
+  // }
+
+  const fDate = (date, noDay) => {
     let fDate = ''
-    if (!date) {
-      fDate = '???'
+    if (date === '') {
+      if (localShortDate.value) {
+        fDate = '???' + String.fromCharCode(160).repeat(2)
+      } else {
+        fDate = '???' + String.fromCharCode(160).repeat(5)
+      }
     } else {
-      const dateYear = date.substr(0, 4)
+      const dateYear = date.substr(2, 2)
       const dateMonth = date.substr(5, 2)
-      const dateDay = date.substr(8, 2)
-      fDate = dateDay + '/' + dateMonth + '/' + dateYear
+      const dateDay = noDay ? '??' : date.substr(8, 2)
+      if (localShortDate.value) {
+        fDate = dateDay + '/' + dateMonth
+      } else {
+        fDate = dateDay + '/' + dateMonth + '/' + dateYear
+      }
     }
     return fDate
+  }
+
+  const fDay = (date, noDay) => {
+    const weekday = ['D', 'L', 'M', 'W', 'J', 'V', 'S']
+
+    let fDay = ''
+    if (date === '') {
+      fDay = '?'
+    } else if (noDay) {
+      fDay = '?'
+    } else {
+      const d = new Date(date)
+      fDay = weekday[d.getDay()]
+    }
+    return fDay
   }
 
   const getRouteOwner = () => {
@@ -203,24 +267,21 @@
       <span class="label text-cs-h3">Nombre:</span>
       <span class="text-cs-h3 sm:font-bold">{{ ride.name }}</span>
       <span class="label text-cs-h3">Tipo:</span>
-      <span class="text-cs-h3">- {{ capitalize(ride.type) }}</span>
+      <span class="text-cs-h3"><span class="hidden sm:inline">- </span>{{ capitalize(ride.type) }}</span>
       <span class="text-cs-h3 sm:underline sm:underline-offset-2">Fechas:</span>
-      <div class="dates-grid">
+      <div class="dates-layout text-20px">
         <template v-if="renderDates">
-          <template
+          <div
             v-for="(date, index) in dates"
-            :key="index"
+            class="dates-grid"
+            :key="date?.date"
+            ref="datesRef"
           >
-            <span
-              class="text-cs-h3 col-start-1"
-              :class="{ canceled: date.canceled === true }"
-              >{{ formatDate(date.date) }}</span
-            >
-            <span
-              class="text-cs-h3"
-              :class="{ canceled: date.canceled === true }"
-              >{{ date.days }} {{ date.days == 1 ? 'dia' : 'dias' }}</span
-            >
+            <p :class="{ canceled: date.canceled === true }">
+              {{ fDay(date.date, date.noDay) }} {{ fDate(date.date, date.noDay) }} {{ date.days }}&nbsp;{{
+                date.days == 1 ? 'dia&nbsp;' : 'dias'
+              }}&nbsp;
+            </p>
 
             <div
               v-if="date.message"
@@ -250,12 +311,12 @@
               >
               </IconDelete>
             </div>
-          </template>
+          </div>
         </template>
 
         <FormKit
           type="form"
-          form-class="col-start-1 col-end-4 add-date-grid"
+          form-class="add-date-grid"
           :actions="false"
           @submit="addDate"
           validation-visibility="submit"
@@ -287,7 +348,7 @@
             :validation-messages="{ required: 'La duración es obligatoria' }"
             v-model.trim="formData.days"
           />
-          <div class="flex gap-4 ml-2 sm:col-start-1 col-end-3 sm:justify-self-end">
+          <div class="flex gap-4 ml-2 justify-self-end">
             <FormKit
               v-if="showFormkit"
               type="button"
@@ -307,10 +368,7 @@
           </div>
         </FormKit>
 
-        <div
-          v-if="!showFormkit"
-          class="col-start-1 col-end-4"
-        >
+        <div v-if="!showFormkit">
           <button
             class="btn btn-std btn-submit mb-4"
             @click.prevent="showDateFields(true)"
@@ -367,18 +425,26 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: min-content min-content;
   }
+  .dates-layout {
+    display: grid;
+    grid-template-columns: max-content;
+    column-gap: 8px;
+    row-gap: 8px;
+  }
   .dates-grid {
     display: grid;
     column-gap: 16px;
     row-gap: 8px;
-    grid-template-columns: max-content max-content 1fr;
+    font-family: cousine, monospace;
+    grid-template-columns: minmax(20rem, max-content) 1fr;
   }
   .add-date-grid {
     display: grid;
     column-gap: 16px;
     row-gap: 8px;
     align-items: center;
-    grid-template-columns: max-content max-content max-content;
+    justify-items: start;
+    grid-template-columns: max-content max-content;
   }
   .tracks-grid {
     /* width: 100px; */

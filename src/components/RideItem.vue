@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, nextTick, useTemplateRef, onMounted } from 'vue'
+  import { ref, computed, nextTick, useTemplateRef, onMounted, onUnmounted, onUpdated, watchEffect } from 'vue'
   import IconEye from '@/components/icons/IconEye.vue'
   import IconPlus from '@/components/icons/IconPlus.vue'
   import IconMinus from '@/components/icons/IconMinus.vue'
@@ -28,14 +28,69 @@
       type: Object,
       required: true,
     },
+    dateWidth: {
+      type: Number,
+      default: 10,
+    },
+    shortDate: {
+      type: Boolean,
+      default: false,
+    },
   })
 
   const datesRef = useTemplateRef('datesRef')
+  const localShortDate = ref(false)
+  const isMobile = ref(false)
 
-  onMounted(() => console.log(datesRef.value))
+  onMounted(() => {
+    window.addEventListener('resize', handleWindowSizeChange)
+    handleWindowSizeChange()
 
-  // dateRef.value.style.color = 'red'
-  console.log(datesRef.value)
+    // if (datesRef.value) {
+    //   const datesDiv = datesRef.value[0]
+    //   if (isMobile.value && props.dateWidth > 0) {
+    //     datesDiv.style = `grid-template-columns: minmax(${props.dateWidth}rem, max-content) 1fr`
+    //   } else {
+    //     datesDiv.style = `grid-template-columns: minmax(10rem, max-content) 1fr`
+    //   }
+    // }
+
+    watchEffect(() => {
+      if (datesRef.value) {
+        // datesRef.value.forEach(dateRef => {
+        //   const datesDiv = dateRef
+        //   if (isMobile.value && props.dateWidth > 0) {
+        //     datesDiv.style = `grid-template-columns: minmax(${props.dateWidth}rem, max-content) 1fr`
+        //   } else {
+        //     datesDiv.style = `grid-template-columns: minmax(10rem, max-content) 1fr`
+        //   }
+        // })
+        localShortDate.value = localShortDate.value
+        if (isMobile.value) {
+          localShortDate.value = props.shortDate
+        } else {
+          localShortDate.value = false
+        }
+      }
+    })
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('resize', handleWindowSizeChange)
+  })
+
+  onUpdated(() => {
+    if (datesRef.value) {
+      datesRef.value.forEach(dateRef => {
+        const datesDiv = dateRef
+        if (isMobile.value && props.dateWidth > 0) {
+          datesDiv.style = `grid-template-columns: minmax(${props.dateWidth}rem, max-content) 1fr`
+        } else {
+          datesDiv.style = `grid-template-columns: minmax(10rem, max-content) 1fr`
+        }
+      })
+    }
+  })
 
   const emit = defineEmits(['viewRideEvent', 'addShortname', 'removeShortname'])
 
@@ -51,6 +106,9 @@
     refreshLocalDates
     const localDates = deepCopy(props.dates)
     localDates.forEach(date => {
+      if (date.noDay) {
+        date.date = date.date.substr(0, 8) + '00'
+      }
       date.usersList = deepCopy(localUsersList)
       date.usersList.forEach((user, userIndex) => {
         if (date.users) {
@@ -75,12 +133,20 @@
   const fDate = date => {
     let fDate = ''
     if (date === '') {
-      fDate = '???' + String.fromCharCode(160).repeat(5)
+      if (localShortDate.value) {
+        fDate = '???' + String.fromCharCode(160).repeat(2)
+      } else {
+        fDate = '???' + String.fromCharCode(160).repeat(5)
+      }
     } else {
       const dateYear = date.substr(2, 2)
       const dateMonth = date.substr(5, 2)
-      const dateDay = date.substr(8, 2)
-      fDate = dateDay + '/' + dateMonth + '/' + dateYear
+      const dateDay = date.substr(8, 2) == 0 ? '??' : date.substr(8, 2)
+      if (localShortDate.value) {
+        fDate = dateDay + '/' + dateMonth
+      } else {
+        fDate = dateDay + '/' + dateMonth + '/' + dateYear
+      }
     }
     return fDate
   }
@@ -90,6 +156,8 @@
 
     let fDay = ''
     if (date === '') {
+      fDay = '?'
+    } else if (date.substr(8, 2) == 0) {
       fDay = '?'
     } else {
       const d = new Date(date)
@@ -130,6 +198,15 @@
     await nextTick()
     renderUserList.value = true
   }
+
+  function handleWindowSizeChange() {
+    isMobile.value = screen.width <= 480
+    if (isMobile) {
+      localShortDate.value = props.shortDate
+    } else {
+      localShortDate.value = false
+    }
+  }
 </script>
 
 <template>
@@ -144,77 +221,69 @@
         top="-8px"
       />
     </div>
-    <div class="row-start-2 col-start-1 dates-container">
-      <template
-        v-for="(date, index) in localDates"
-        :key="date.date"
-        ref="datesRef"
-      >
-        <p :class="{ canceled: date.canceled === true }">{{ fDay(date.date) }} {{ fDate(date.date) }} {{ date.days }}&nbsp;</p>
-        <!-- <p :class="{ canceled: date.canceled === true }">
-          {{ fDay(date.date) }}
-        </p>
-        <p :class="{ canceled: date.canceled === true }">
-          {{ fDate(date.date) }}
-        </p>
-        <p :class="{ canceled: date.canceled === true }">{{ date.days }}&nbsp;</p> -->
+    <div
+      v-for="(date, index) in localDates"
+      class="col-start-1 dates-container"
+      :key="date?.date"
+      ref="datesRef"
+    >
+      <p :class="{ canceled: date.canceled === true }">{{ fDay(date.date) }} {{ fDate(date.date) }} {{ date.days }}&nbsp;</p>
 
-        <div class="flex items-center flex-wrap gap-x-1 gap-y-3">
-          <UserBadge
-            v-for="shortName in date.shortNames"
-            :shortName="shortName"
-            :currentShortname="currentShortname"
-          />
-          <IconMinus
-            v-if="date.userIncluded && !userAdmin"
-            class="icon"
-            size="2.0rem"
-            title="Desapuntarme de la ruta"
-            @click="removeShortname(date)"
-          />
-          <IconPlus
-            v-if="!date.userIncluded && !userAdmin"
-            class="icon"
-            size="2.0rem"
-            title="Apuntarme a la ruta"
-            @click="addShortname(date)"
-          />
-          <IconList
-            v-if="userAdmin"
-            class="icon"
-            size="2.0rem"
-            title="Lista de usuarios"
-            @click="addUsersList(index, date)"
-          />
-          <template v-if="renderUserList">
-            <div class="flex flex-wrap gap-3 items-center">
-              <div
-                v-for="user in date.usersList"
-                key="user.id"
+      <div class="flex items-center flex-wrap gap-x-1 gap-y-3">
+        <UserBadge
+          v-for="shortName in date.shortNames"
+          :shortName="shortName"
+          :currentShortname="currentShortname"
+        />
+        <IconMinus
+          v-if="date.userIncluded && !userAdmin"
+          class="icon"
+          size="2.0rem"
+          title="Desapuntarme de la ruta"
+          @click="removeShortname(date)"
+        />
+        <IconPlus
+          v-if="!date.userIncluded && !userAdmin"
+          class="icon"
+          size="2.0rem"
+          title="Apuntarme a la ruta"
+          @click="addShortname(date)"
+        />
+        <IconList
+          v-if="userAdmin"
+          class="icon"
+          size="2.0rem"
+          title="Lista de usuarios"
+          @click="addUsersList(index, date)"
+        />
+        <template v-if="renderUserList">
+          <div class="flex flex-wrap gap-3 items-center">
+            <div
+              v-for="user in date.usersList"
+              key="user.id"
+            >
+              <input
+                class="text-cs-std mr-1"
+                type="checkbox"
+                :id="user.id"
+                :value="user.id"
+                :checked="user.checked"
+                @click="addUserToList(date, user)"
+              />
+              <label
+                :for="user.id"
+                class="text-cs-std sm:hidden"
+                >{{ user.name }}</label
               >
-                <input
-                  class="text-cs-std mr-1"
-                  type="checkbox"
-                  :id="user.id"
-                  :value="user.id"
-                  :checked="user.checked"
-                  @click="addUserToList(date, user)"
-                />
-                <label
-                  :for="user.id"
-                  class="text-cs-std sm:hidden"
-                  >{{ user.name }}</label
-                >
-                <label
-                  :for="user.id"
-                  class="text-cs-std hidden sm:inline"
-                  >{{ user.shortName }}</label
-                >
-              </div>
+              <label
+                :for="user.id"
+                class="text-cs-std hidden sm:inline"
+                >{{ user.shortName }}</label
+              >
             </div>
-          </template>
-        </div>
-      </template>
+          </div>
+        </template>
+      </div>
     </div>
     <div class="button-container">
       <IconEye
@@ -247,13 +316,14 @@
     flex-flow: row wrap;
     column-gap: 4px;
     font-family: monospace; */
+    font-family: cousine, monospace;
     display: grid;
     grid-template-columns: minmax(10rem, max-content) 1fr;
     column-gap: 4px;
   }
 
   .button-container {
-    grid-row: 1 / -1;
+    grid-row: 1 / 10;
     grid-column: 2 / 3;
     align-self: center;
     display: flex;

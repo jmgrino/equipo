@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('authStore', () => {
   let validUser = ref(false)
   let validUserData = ref(false)
   let errorMessage = ref(null)
+  const showModSpace = ref(false)
 
   function init() {
     onAuthStateChanged(auth, userCredential => {
@@ -151,6 +152,7 @@ export const useAuthStore = defineStore('authStore', () => {
   return {
     user,
     errorMessage,
+    showModSpace,
     init,
     login,
     logout,

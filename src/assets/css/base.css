@@ -1,7 +1,7 @@
 @layer base {
   html {
     /* font-size: 10px; */
-  
+
     /* 10px / 16px = 0.625 = 62.5% */
     /* Percentage of user's browser font-size setting */
     font-size: 62.5%;
@@ -12,25 +12,24 @@
     overflow-x: hidden;
   }
   :root {
-    --color-std: #5A7687;
+    --color-std: #5a7687;
     --color-std-shade: #4f6877;
     --color-std-tint: #6b8493;
-    
+
     --color-std-high: #e67e22;
     --color-std-high-shade: #cf711f;
     --color-std-high-tint: #d6a15e;
-    
+
     /* --color-std-background: ##f9fafb;
     --color-std-background: #F0F2F5; */
-    --color-std-background: #FDFDFD;
+    --color-std-background: #fdfdfd;
     --color-std-background-transparent: rgba(253, 253, 253, 0.8);
-    
-    --color-std-text: #5A7687;
+
+    --color-std-text: #5a7687;
 
     --fk-max-width-input: 400px;
 
     --header-height: 7.6rem;
-  
   }
 }
 
@@ -47,11 +46,11 @@
 /* ===================== */
 
 .cs-h1 {
-  @apply text-cs-h1 mb-4
+  @apply text-cs-h1 mb-4;
 }
 
 .cs-h2 {
-  @apply text-cs-h2 mb-3
+  @apply text-cs-h2 mb-3;
 }
 
 /* ===================== */
@@ -71,12 +70,11 @@
 .btn-submit,
 .btn-submit:link,
 .btn-submit:visited {
-  fill: #FFFFFF;
-  color: #FFFFFF;
+  fill: #ffffff;
+  color: #ffffff;
   border-color: var(--color-std-high);
   background-color: var(--color-std-high);
 }
-
 
 .btn-submit:hover,
 .btn-submit:active {
@@ -108,10 +106,9 @@
   border-color: var(--color-std-high);
 }
 
-
 .btn-selector:hover,
 .btn-selector:active {
-  color: #FFFFFF;
+  color: #ffffff;
   border-color: var(--color-std-high);
   background-color: var(--color-std-high);
 }
@@ -144,32 +141,29 @@
   font-weight: 400;
   line-height: 1.5;
   min-width: 100px;
-  padding: none;
+  padding: 0;
 }
 
 .missing-properties {
-
   min-width: 130px;
 
   fill: #4c4c4c;
 }
 
-  /******************************/
-  /* BELOW 768px (Mini Tablets) */
-  /******************************/
+/******************************/
+/* BELOW 768px (Mini Tablets) */
+/******************************/
 
-  @media (max-width: 48em) {
-
-    .btn-selector:hover {
-      color: var(--color-std-high);
-      background-color: var(--color-std-background);
-      border-color: var(--color-std-high);
-    }
-
-    .btn-selector:active {
-      color: #FFFFFF;
-      border-color: var(--color-std-high);
-      background-color: var(--color-std-high);
-    }
-
+@media (max-width: 48em) {
+  .btn-selector:hover {
+    color: var(--color-std-high);
+    background-color: var(--color-std-background);
+    border-color: var(--color-std-high);
   }
+
+  .btn-selector:active {
+    color: #ffffff;
+    border-color: var(--color-std-high);
+    background-color: var(--color-std-high);
+  }
+}

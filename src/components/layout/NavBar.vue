@@ -8,6 +8,7 @@
   const authStore = useAuthStore()
 
   const isOpen = ref(false)
+  const showModSpace = ref(false)
   const userPage = computed(() => {
     if (authStore.user) {
       return { name: 'user', params: { id: authStore.user.id } }
@@ -28,8 +29,9 @@
     return userName
   })
 
-  const menu1 = () => {
-    // isOpen.value = false
+  const modSpace = () => {
+    authStore.showModSpace = true
+    isOpen.value = false
   }
 </script>
 
@@ -69,33 +71,15 @@
     <nav class="main-nav">
       <ul class="main-nav-list">
         <h3 class="text-cs-h4 md:mt-4 hidden md:block">Versión {{ versionNumber }}</h3>
-        <li>
+        <li class="hidden sm:list-item">
           <a
             class="main-nav-link"
-            @click="menu1"
-            >Menu 4</a
+            @click="modSpace"
+            >Formato</a
           >
         </li>
         <li>
-          <a
-            class="main-nav-link"
-            @click="menu1"
-            >Menu 3</a
-          >
-        </li>
-        <li>
-          <a
-            class="main-nav-link"
-            @click="menu1"
-            >Menu 2</a
-          >
-        </li>
-        <li>
-          <a
-            class="main-nav-link"
-            @click="menu1"
-            >Menu 1</a
-          >
+          <a class="main-nav-link">...</a>
         </li>
 
         <!-- <li><a class="main-nav-link nav-cta" @click="menu1">Action</a></li> -->
