@@ -5,12 +5,14 @@
   import useStorage from '@/composables/useStorage'
   import IconDelete from '@/components/icons/IconDelete.vue'
   import IconDownload from '@/components/icons/IconDownload.vue'
+  import SubmitButton from '@/components/form/SubmitButton.vue'
+  import InputFile from '@/components/form/InputFile.vue'
 
-  const MAX_SIZE_KB = 15000
-  const VALID_EXT = '.gpx,.kmz,.kml'
+  const MAX_SIZE_KB = 1000
+  const VALID_EXT = '.jpg,.png,.jpeg'
 
   const ridesStore = useRidesStore()
-  const { url, filePath, uploadFile, deleteFile } = useStorage('tracks')
+  const { url, filePath, uploadFile, deleteFile } = useStorage('photos')
   const router = useRouter()
   const route = useRoute()
 
@@ -20,11 +22,11 @@
   const renderDates = ref(true)
   const errorMessages = ref([])
   const showName = ref(false)
-  const canAddTrack = ref(false)
-  const isWrap = ref(false)
+  const canAddPhoto = ref(false)
+  const selectedPhoto = ref('')
 
   let ride = reactive({})
-  let tracks = ref([])
+  let photos = ref([])
   let timeoutID
 
   const formData = reactive({
@@ -39,37 +41,44 @@
 
     ride = await ridesStore.getRide(id)
 
-    await ridesStore.checkValidTracks()
+    await ridesStore.checkValidPhotos()
 
-    const allTracks = computed(() => {
-      return ridesStore.deepCopy(ridesStore.tracks)
+    const allPhotos = computed(() => {
+      return ridesStore.deepCopy(ridesStore.photos)
     })
 
-    tracks.value = allTracks.value.filter(track => track.ride === ride.id)
+    photos.value = allPhotos.value.filter(photo => photo.ride === ride.id)
 
     pageTitle.value = ride.name
 
     fetching.value = false
   }
 
-  async function addTrack() {
+  function showPhotoFields(value) {
+    showForm.value = value
+    if (value) {
+      canAddPhoto.value = false
+    }
+  }
+
+  async function addPhoto() {
     clearArray(errorMessages.value)
     const file = formData.file
 
     await uploadFile(ride.id, file)
 
-    const track = {
+    const photo = {
       name: formData.name,
       ride: ride.id,
       url: url.value,
       filePath: filePath.value,
     }
 
-    const newId = await ridesStore.addTrack(track)
+    const newId = await ridesStore.addPhoto(photo)
 
-    tracks.value.push({
+    photos.value.push({
       id: newId,
-      ...track,
+      ...photo,
     })
 
     formData.name = ''
@@ -80,31 +89,28 @@
     forceRender()
   }
 
-  function cancelAddTrack() {
+  function cancelAddPhoto() {
     showForm.value = false
     clearArray(errorMessages.value)
     formData.name = ''
     formData.file = null
   }
 
-  function deleteTrack(index) {
-    tracks.value[index].confirm = true
-    isWrap.value = true
+  function deletePhoto(index) {
+    photos.value[index].confirm = true
     timeoutID = setTimeout(() => {
-      tracks.value[index].confirm = false
-      isWrap.value = false
+      photos.value[index].confirm = false
       forceRender()
     }, 3000)
 
     forceRender()
   }
 
-  async function confirmDeleteTrack(index) {
+  async function confirmDeletePhoto(index) {
     clearTimeout(timeoutID)
-    await deleteFile(tracks.value[index].filePath)
-    await ridesStore.deleteTrack(tracks.value[index].id)
-    tracks.value.splice(index, 1)
-    isWrap.value = false
+    await deleteFile(photos.value[index].filePath)
+    await ridesStore.deletePhoto(photos.value[index].id)
+    photos.value.splice(index, 1)
 
     forceRender()
   }
@@ -128,8 +134,7 @@
       if (!checkSize(fileSize)) {
         const maxSizeMbites = Math.trunc(MAX_SIZE_KB / 1000)
         const fileSizeMbites = Math.trunc(fileSize / 1000000)
-        const mByte = fileSizeMbites === 1 ? 'Mbyte' : 'Mbytes'
-        const errorMessage = `Fichero demasiado grande (más de ${fileSizeMbites} ${mByte}). Tamaño máximo ${maxSizeMbites} ${mByte}`
+        const errorMessage = `Fichero demasiado grande (más de ${fileSizeMbites} Mbytes). Tamaño máximo ${maxSizeMbites} Mbytes`
 
         errorMessages.value.push(errorMessage)
         validFile = false
@@ -140,10 +145,8 @@
     }
 
     if (validFile) {
-      canAddTrack.value = true
+      canAddPhoto.value = true
     }
-
-    showForm.value = true
   }
 
   function checkSize(fileSize) {
@@ -166,6 +169,10 @@
     renderDates.value = false
     await nextTick()
     renderDates.value = true
+  }
+
+  function displayPhoto(photo) {
+    selectedPhoto.value = photo
   }
 
   function clearArray(array) {
@@ -196,114 +203,121 @@
       class="pt-5 px-10"
     >
       <template v-if="renderDates">
-        <template
-          v-for="(track, index) in tracks"
+        <div
+          v-for="(photo, index) in photos"
           :key="index"
+          class="photo-flex mb-4"
         >
-          <div
-            class="track-flex mb-4"
-            :class="{ 'track-wrap': isWrap }"
+          <!-- <span class="text-cs-h3 col-start-1">{{ photo.name }}</span> -->
+          <span
+            class="text-cs-h3 cursor-pointer hover:text-color-std-high"
+            @click="displayPhoto(photo)"
+            >{{ photo.name }}</span
           >
-            <span class="text-cs-h3">{{ track.name }}</span>
-            <div
-              v-if="track.confirm"
-              class="flex-none"
+          <div
+            v-if="photo.confirm"
+            class="sm:col-start-1 sm:col-span-3"
+          >
+            <button
+              class="btn btn-std btn-submit"
+              @click="confirmDeletePhoto(index)"
             >
-              <button
-                class="btn btn-std btn-submit"
-                @click="confirmDeleteTrack(index)"
-              >
-                Confirmar borrado
-              </button>
-            </div>
-            <div v-else>
-              <IconDelete
-                class="icon"
-                size="3.2rem"
-                title="Borrar track"
-                @click="deleteTrack(index)"
-              >
-              </IconDelete>
-            </div>
-            <a :href="track.url">
-              <IconDownload
-                :class="{ 'hide-icon': isWrap }"
-                class="icon"
-                size="3.2rem"
-                title="Descargar track"
-              >
-              </IconDownload>
-            </a>
+              Confirmar borrado
+            </button>
           </div>
-        </template>
+          <div v-else>
+            <IconDelete
+              class="icon ml-4"
+              size="3.2rem"
+              title="Borrar foto"
+              @click="deletePhoto(index)"
+            >
+            </IconDelete>
+          </div>
+          <a :href="photo.url">
+            <IconDownload
+              class="icon"
+              size="3.2rem"
+              title="Descargar foto"
+            >
+            </IconDownload>
+          </a>
+        </div>
       </template>
     </div>
 
-    <div class="pt-14 px-10">
+    <div
+      v-if="!showForm"
+      class="pt-10 px-10"
+    >
+      <SubmitButton
+        label="Añadir foto"
+        class="my-4"
+        @OnClick="showPhotoFields(true)"
+      />
+    </div>
+
+    <div
+      v-if="showForm"
+      class="pt-14 px-10"
+    >
       <form class="load-form-grid">
         <InputFile
-          class="mb-4"
-          label="Añadir"
-          name="track"
+          label="Cargar photo"
+          name="photo"
           :accept="VALID_EXT"
           @onChange="fileSelected"
         />
+        <InputText
+          name="filename"
+          class="mt-2 sm:col-span-full sm:mt-6"
+          v-model="formData.name"
+        />
+        <p class="col-span-full text-gray-400">{{ formData.file ? 'Fichero: ' + formData.file?.name : '' }}</p>
         <div
-          v-if="showForm"
-          class="overflow-hidden pr-1 sm:col-span-full"
+          v-if="errorMessages.length > 0"
+          class="col-span-full text-16px text-red-600"
         >
-          <InputText
-            name="filename"
-            class="mt-2 sm:mt-6"
-            v-model="formData.name"
-          />
-          <p class="col-span-full text-gray-400 w-full word-wrap">
-            {{ formData.file ? 'Fichero: ' + formData.file?.name : '' }}
+          <p v-for="errorMessage in errorMessages">
+            {{ errorMessage }}
           </p>
-          <div
-            v-if="errorMessages.length > 0"
-            class="col-span-full text-16px text-red-600"
-          >
-            <p v-for="errorMessage in errorMessages">
-              {{ errorMessage }}
-            </p>
-          </div>
-          <div class="col-span-full justify-self-end my-8">
-            <CancelButton
-              label="Cancelar"
-              @onClick="cancelAddTrack"
-              class="mr-4"
-            />
-            <SubmitButton
-              label="Añadir"
-              @onClick="addTrack"
-              :disabled="!canAddTrack"
-            />
-          </div>
+        </div>
+        <div class="col-span-full justify-self-end my-8">
+          <CancelButton
+            label="Cancelar"
+            @onClick="cancelAddPhoto"
+            class="mr-4"
+          />
+          <SubmitButton
+            label="Añadir"
+            @onClick="addPhoto"
+            :disabled="!canAddPhoto"
+          />
         </div>
       </form>
       <hr />
+    </div>
+    <div
+      v-if="selectedPhoto"
+      class="mt-8 px-10"
+    >
+      <p class="text-cs-h3">{{ selectedPhoto.name }}</p>
+      <img
+        :src="selectedPhoto.url"
+        alt="Selected photo"
+        class="w-full"
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
-  .track-flex {
+  .photo-flex {
     display: flex;
     column-gap: 8px;
-    align-items: center;
-    overflow-wrap: anywhere;
+    word-wrap: break-word;
   }
-
-  .track-wrap {
-    flex-wrap: nowrap;
-  }
-
-  .hide-icon {
-    display: none;
-  }
-
-  .add-track-grid {
+  .add-photo-grid {
     display: grid;
     column-gap: 16px;
     row-gap: 8px;
@@ -322,19 +336,13 @@
   .icon:hover {
     color: var(--color-std-high);
   }
-  .word-wrap {
-    word-wrap: break-word;
-  }
 
   @media (max-width: 640px) {
-    .add-track-grid {
+    .add-photo-grid {
       grid-template-columns: 1fr;
     }
-    .track-grid {
+    .photo-grid {
       grid-template-columns: minmax(70%, max-content) max-content min-content 1fr;
-    }
-    .track-wrap {
-      flex-wrap: wrap;
     }
   }
 </style>

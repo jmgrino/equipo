@@ -40,6 +40,11 @@ const router = createRouter({
       component: () => import('../views/TracksView.vue'),
     },
     {
+      path: '/rides/edit/:id/photo',
+      name: 'photo',
+      component: () => import('../views/PhotoView.vue'),
+    },
+    {
       path: '/login',
       name: 'login',
       component: loginView,

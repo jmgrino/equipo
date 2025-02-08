@@ -12,13 +12,16 @@
 </script>
 
 <template>
-  <div :class="{ loader: true, fadeout: !isLoading }">{{ message }}</div>
+  <div :class="{ loader: true, fadeout: !isLoading }">
+    <span class="line">
+      {{ message }}
+    </span>
+  </div>
 </template>
 
 <style scoped>
   .loader {
-    background-color: #63ab97;
-    background-color: #fef3c7;
+    background-color: #fdfdfd;
     bottom: 0;
     color: white;
     color: var(--color-std-text);
@@ -41,6 +44,32 @@
     to {
       opacity: 0;
       visibility: hidden;
+    }
+  }
+
+  .line {
+    position: relative;
+  }
+  
+  .line::after {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 0;
+    width: 275px;
+    height: 20px;
+    border-bottom: 4px solid #5a7687;
+    transform-origin: left center;
+    animation: moving 3s linear infinite;
+  }
+
+  @keyframes moving {
+    from {
+      transform: scaleX(0);
+    }
+
+    to {
+      transform: scaleX(100%);
     }
   }
 </style>

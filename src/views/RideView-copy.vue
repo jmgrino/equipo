@@ -1,10 +1,12 @@
 <script setup>
-  import { reactive, ref, nextTick, onMounted, onUpdated, computed } from 'vue'
-  import { useAuthStore } from '@/stores/authStore'
+  import { reactive, ref, nextTick, onMounted, onUpdated, useTemplateRef } from 'vue'
   import { useRidesStore } from '@/stores/ridesStore'
+  import { useAuthStore } from '@/stores/authStore'
   import { useRouter, useRoute } from 'vue-router'
   import IconDelete from '@/components/icons/IconDelete.vue'
   import IconDownload from '@/components/icons/IconDownload.vue'
+
+  // import { getValidationMessages } from '@formkit/validation'
 
   const ridesStore = useRidesStore()
   const authStore = useAuthStore()
@@ -14,24 +16,28 @@
   let ride = reactive({})
   let dates = reactive({})
   let tracks = reactive({})
-  let photos = ref([])
-
   const createdBy = ref({})
+
   const fetching = ref(false)
   const routeOnwer = ref(false)
   const renderDates = ref(true)
-  const showForm = ref(false)
+  const showFormkit = ref(false)
+  const errorMessage = ref('')
 
+  const datesRef = useTemplateRef('datesRef')
   const localShortDate = ref(false)
   const isMobile = ref(false)
-  const datesRef = ref(null)
+
   let timeoutID
 
   const formData = reactive({
     date: '',
     days: 1,
-    noDay: false,
   })
+
+  // const isMobile = computed(() => {
+  //   return screen.width <= 760
+  // })
 
   onMounted(() => {
     isMobile.value = screen.width <= 480
@@ -64,14 +70,7 @@
     ride = await ridesStore.getRide(id)
     dates = await ridesStore.getRideDates(id)
     tracks = ridesStore.tracks.filter(track => track.ride === ride.id)
-
-    await ridesStore.checkValidPhotos()
-
-    const allPhotos = computed(() => {
-      return ridesStore.deepCopy(ridesStore.photos)
-    })
-
-    photos.value = allPhotos.value.filter(photo => photo.ride === ride.id)
+    // tracks = ridesStore.tracks
 
     createdBy.value = await authStore.getUser(ride.owner)
 
@@ -79,6 +78,19 @@
 
     routeOnwer.value = getRouteOwner()
   }
+
+  // const formatDate = date => {
+  //   let fDate = ''
+  //   if (!date) {
+  //     fDate = '???'
+  //   } else {
+  //     const dateYear = date.substr(0, 4)
+  //     const dateMonth = date.substr(5, 2)
+  //     const dateDay = date.substr(8, 2)
+  //     fDate = dateDay + '/' + dateMonth + '/' + dateYear
+  //   }
+  //   return fDate
+  // }
 
   const fDate = (date, noDay) => {
     let fDate = ''
@@ -129,7 +141,7 @@
   }
 
   function showDateFields(value) {
-    showForm.value = value
+    showFormkit.value = value
   }
 
   async function addDate() {
@@ -138,7 +150,6 @@
       days: formData.days,
       ride: ride.id,
       owner: authStore.user.id,
-      noDay: formData.noDay,
     }
     const dateId = await ridesStore.addDate(date)
     date.id = dateId
@@ -160,8 +171,6 @@
 
     formData.date = ''
     formData.days = 1
-    formData.noDay = false
-
     forceRender()
   }
 
@@ -236,15 +245,19 @@
         >Ruta creada por {{ createdBy.name }}</span
       >
       <div class="justify-self-end flex gap-5 sm:row-start-1">
-        <CancelButton
-          label="Volver"
-          @onClick="router.push({ name: 'rides' })"
-        />
-        <SubmitButton
+        <button
+          class="btn btn-std btn-cancel"
+          @click="router.push({ name: 'rides' })"
+        >
+          Volver
+        </button>
+        <button
           v-if="routeOnwer"
-          label="Editar"
-          @onClick="editRide"
-        />
+          class="btn btn-std btn-submit"
+          @click="editRide"
+        >
+          Editar
+        </button>
       </div>
     </div>
     <div
@@ -256,7 +269,7 @@
       <span class="label text-cs-h3">Tipo:</span>
       <span class="text-cs-h3"><span class="hidden sm:inline">- </span>{{ capitalize(ride.type) }}</span>
       <span class="text-cs-h3 sm:underline sm:underline-offset-2">Fechas:</span>
-      <div class="dates-grid-layout text-20px">
+      <div class="dates-layout text-20px">
         <template v-if="renderDates">
           <div
             v-for="(date, index) in dates"
@@ -301,44 +314,61 @@
           </div>
         </template>
 
-        <form
-          v-if="showForm"
-          @submit.prevent="addDate"
-          class="add-date-grid"
+        <FormKit
+          type="form"
+          form-class="add-date-grid"
+          :actions="false"
+          @submit="addDate"
+          validation-visibility="submit"
+          :incomplete-message="false"
+          :value="formData"
         >
-          <InputDate
-            label="Fecha"
-            name="date"
-            v-model="formData.date"
-          />
-          <InputText
-            label="Dias"
-            type="number"
-            name="days"
-            width="50px"
-            v-model="formData.days"
-          />
-          <InputCheckbox
-            zclass="sm:col-span-full"
-            label="Mensual"
-            name="noDay"
-            v-model="formData.noDay"
-            :required="true"
-          />
-          <div class="col-span-full justify-self-end mt-8">
-            <CancelButton
-              label="Cancelar"
-              @onClick="showDateFields(false)"
-              class="mr-4"
-            />
-            <SubmitButton
-              label="Añadir"
-              type="submit"
+          <div
+            v-if="showFormkit"
+            class="flex items-center"
+          >
+            <FormKit
+              label="Fecha"
+              input-class="min-w-[13rem]"
+              type="date"
+              :name="'date'"
+              placeholder="Fecha"
+              v-model.trim="formData.date"
             />
           </div>
-        </form>
+          <FormKit
+            v-if="showFormkit"
+            label="Dias"
+            input-class="w-[4rem]"
+            type="number"
+            :name="'days'"
+            placeholder=""
+            validation="required"
+            min="1"
+            :validation-messages="{ required: 'La duración es obligatoria' }"
+            v-model.trim="formData.days"
+          />
+          <div class="flex gap-4 ml-2 justify-self-end">
+            <FormKit
+              v-if="showFormkit"
+              type="button"
+              label="Cancelar"
+              outer-class="cancel-button sm:justify-self-end"
+              wrapper-class="mt-6"
+              @click.prevent="showDateFields(false)"
+            />
 
-        <div v-if="!showForm">
+            <FormKit
+              v-if="showFormkit"
+              type="submit"
+              label="Añadir"
+              outer-class="submit-button"
+              wrapper-class="mt-6"
+            />
+          </div>
+        </FormKit>
+
+        <div v-if="!showFormkit">
           <button
             class="btn btn-std btn-submit mb-4"
             @click.prevent="showDateFields(true)"
@@ -359,13 +389,9 @@
       >
       <template v-if="tracks.length > 0">
         <span class="text-cs-h3 mt-4 sm:underline sm:underline-offset-2">Tracks:</span>
-        <!-- <p class="text-cs-h1 text-red-600">Modificar tracks grid</p> -->
-        <div class="col-start-2 sm:col-start-1 mt-4 sm:mt-0">
-          <div
-            v-for="track in tracks"
-            class="track-flex"
-          >
-            <span class="text-cs-h3 self-start hidden sm:block">-</span>
+        <div class="col-start-2 sm:col-start-1 tracks-grid mt-4 sm:mt-0">
+          <template v-for="track in tracks">
+            <span class="text-cs-h3 self-start">-</span>
             <span class="text-cs-h3">{{ track.name }}</span>
             <a
               :href="track.url"
@@ -378,35 +404,10 @@
               >
               </IconDownload>
             </a>
-          </div>
+          </template>
         </div>
       </template>
     </div>
-
-    <div class="mt-16 mb-8">
-      <div
-        v-for="photo in photos"
-        class="mt-8"
-      >
-        <p class="text-cs-h3">{{ photo.name }}</p>
-        <img
-          :src="photo.url"
-          :alt="photo.name"
-          class="w-full"
-        />
-      </div>
-    </div>
-    <!-- <div
-      v-if="selectedPhoto"
-      class="mt-8 px-10"
-    >
-      <p class="text-cs-h3">{{ selectedPhoto.name }}</p>
-      <img
-        :src="selectedPhoto.url"
-        alt="Selected photo"
-        class="w-full"
-      />
-    </div> -->
   </div>
 </template>
 
@@ -424,14 +425,16 @@
     grid-template-columns: 1fr 1fr;
     grid-template-rows: min-content min-content;
   }
-  .dates-grid-layout {
+  .dates-layout {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: max-content;
+    column-gap: 8px;
     row-gap: 8px;
   }
   .dates-grid {
     display: grid;
     column-gap: 16px;
+    row-gap: 8px;
     font-family: cousine, monospace;
     grid-template-columns: minmax(20rem, max-content) 1fr;
   }
@@ -441,15 +444,15 @@
     row-gap: 8px;
     align-items: center;
     justify-items: start;
-    grid-template-columns: max-content max-content 1fr;
+    grid-template-columns: max-content max-content;
   }
-
-  .track-flex {
-    display: flex;
-    column-gap: 8px;
+  .tracks-grid {
+    /* width: 100px; */
+    display: grid;
+    column-gap: 16px;
+    row-gap: 8px;
     align-items: center;
-    overflow-wrap: anywhere;
-    border-bottom: 1px dotted #9ca3af;
+    grid-template-columns: min-content 1fr min-content;
   }
   .icon {
     cursor: pointer;
@@ -472,10 +475,15 @@
     }
     .user-view-grid {
       grid-template-columns: 1fr;
+      /* justify-items: stretch;
+      justify-content: stretch; */
     }
     .header-grid {
       grid-template-columns: 1fr;
       grid-template-rows: min-content min-content;
+    }
+    .add-date-grid {
+      grid-template-columns: min-content max-content;
     }
   }
 </style>

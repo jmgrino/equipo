@@ -16,6 +16,7 @@
     ridesStore.getRides()
     ridesStore.getDates()
     ridesStore.getTracks()
+    ridesStore.getPhotos()
     ridesStore.getUsers()
 
     const validUser = await authStore.checkValidUserData()
@@ -45,11 +46,15 @@
 </script>
 
 <template>
-  <NavBar />
+  <!-- <LoadingScreen
+    :isLoading="true"
+    :message="message"
+  /> -->
   <LoadingScreen
     :isLoading="isLoading"
     :message="message"
   />
+  <NavBar />
   <main
     v-if="!isLoading"
     class="main"

@@ -4,13 +4,13 @@
   import { useRidesStore } from '@/stores/ridesStore'
   import useStorage from '@/composables/useStorage'
   import IconDelete from '@/components/icons/IconDelete.vue'
-  import IconDownload from '@/components/icons/IconDownload.vue'
+  // import IconDownload from '@/components/icons/IconDownload.vue'
 
-  const MAX_SIZE_KB = 15000
-  const VALID_EXT = '.gpx,.kmz,.kml'
+  const MAX_SIZE_KB = 1000
+  const VALID_EXT = '.jpg,.png,.jpeg'
 
   const ridesStore = useRidesStore()
-  const { url, filePath, uploadFile, deleteFile } = useStorage('tracks')
+  const { url, filePath, uploadFile, deleteFile } = useStorage('photos')
   const router = useRouter()
   const route = useRoute()
 
@@ -20,11 +20,12 @@
   const renderDates = ref(true)
   const errorMessages = ref([])
   const showName = ref(false)
-  const canAddTrack = ref(false)
+  const canAddPhoto = ref(false)
   const isWrap = ref(false)
+  const selectedPhoto = ref('')
 
   let ride = reactive({})
-  let tracks = ref([])
+  let photos = ref([])
   let timeoutID
 
   const formData = reactive({
@@ -39,37 +40,37 @@
 
     ride = await ridesStore.getRide(id)
 
-    await ridesStore.checkValidTracks()
+    await ridesStore.checkValidPhotos()
 
-    const allTracks = computed(() => {
-      return ridesStore.deepCopy(ridesStore.tracks)
+    const allPhotos = computed(() => {
+      return ridesStore.deepCopy(ridesStore.photos)
     })
 
-    tracks.value = allTracks.value.filter(track => track.ride === ride.id)
+    photos.value = allPhotos.value.filter(photo => photo.ride === ride.id)
 
     pageTitle.value = ride.name
 
     fetching.value = false
   }
 
-  async function addTrack() {
+  async function addPhoto() {
     clearArray(errorMessages.value)
     const file = formData.file
 
     await uploadFile(ride.id, file)
 
-    const track = {
+    const photo = {
       name: formData.name,
       ride: ride.id,
       url: url.value,
       filePath: filePath.value,
     }
 
-    const newId = await ridesStore.addTrack(track)
+    const newId = await ridesStore.addPhoto(photo)
 
-    tracks.value.push({
+    photos.value.push({
       id: newId,
-      ...track,
+      ...photo,
     })
 
     formData.name = ''
@@ -80,18 +81,18 @@
     forceRender()
   }
 
-  function cancelAddTrack() {
+  function cancelAddPhoto() {
     showForm.value = false
     clearArray(errorMessages.value)
     formData.name = ''
     formData.file = null
   }
 
-  function deleteTrack(index) {
-    tracks.value[index].confirm = true
+  function deletePhoto(index) {
+    photos.value[index].confirm = true
     isWrap.value = true
     timeoutID = setTimeout(() => {
-      tracks.value[index].confirm = false
+      photos.value[index].confirm = false
       isWrap.value = false
       forceRender()
     }, 3000)
@@ -99,11 +100,11 @@
     forceRender()
   }
 
-  async function confirmDeleteTrack(index) {
+  async function confirmDeletePhoto(index) {
     clearTimeout(timeoutID)
-    await deleteFile(tracks.value[index].filePath)
-    await ridesStore.deleteTrack(tracks.value[index].id)
-    tracks.value.splice(index, 1)
+    await deleteFile(photos.value[index].filePath)
+    await ridesStore.deletePhoto(photos.value[index].id)
+    photos.value.splice(index, 1)
     isWrap.value = false
 
     forceRender()
@@ -140,7 +141,7 @@
     }
 
     if (validFile) {
-      canAddTrack.value = true
+      canAddPhoto.value = true
     }
 
     showForm.value = true
@@ -166,6 +167,10 @@
     renderDates.value = false
     await nextTick()
     renderDates.value = true
+  }
+
+  function displayPhoto(photo) {
+    selectedPhoto.value = photo
   }
 
   function clearArray(array) {
@@ -197,21 +202,26 @@
     >
       <template v-if="renderDates">
         <template
-          v-for="(track, index) in tracks"
+          v-for="(photo, index) in photos"
           :key="index"
         >
           <div
-            class="track-flex mb-4"
-            :class="{ 'track-wrap': isWrap }"
+            class="photo-flex mb-4"
+            :class="{ 'photo-wrap': isWrap }"
           >
-            <span class="text-cs-h3">{{ track.name }}</span>
+            <!-- <span class="text-cs-h3 grow-0">{{ photo.name }}</span> -->
+            <span
+              class="text-cs-h3 cursor-pointer hover:text-color-std-high"
+              @click="displayPhoto(photo)"
+              >{{ photo.name }}</span
+            >
             <div
-              v-if="track.confirm"
+              v-if="photo.confirm"
               class="flex-none"
             >
               <button
                 class="btn btn-std btn-submit"
-                @click="confirmDeleteTrack(index)"
+                @click="confirmDeletePhoto(index)"
               >
                 Confirmar borrado
               </button>
@@ -220,20 +230,20 @@
               <IconDelete
                 class="icon"
                 size="3.2rem"
-                title="Borrar track"
-                @click="deleteTrack(index)"
+                title="Borrar photo"
+                @click="deletePhoto(index)"
               >
               </IconDelete>
             </div>
-            <a :href="track.url">
+            <!-- <a :href="photo.url">
               <IconDownload
                 :class="{ 'hide-icon': isWrap }"
                 class="icon"
                 size="3.2rem"
-                title="Descargar track"
+                title="Descargar photo"
               >
               </IconDownload>
-            </a>
+            </a> -->
           </div>
         </template>
       </template>
@@ -244,7 +254,7 @@
         <InputFile
           class="mb-4"
           label="Añadir"
-          name="track"
+          name="photo"
           :accept="VALID_EXT"
           @onChange="fileSelected"
         />
@@ -271,31 +281,42 @@
           <div class="col-span-full justify-self-end my-8">
             <CancelButton
               label="Cancelar"
-              @onClick="cancelAddTrack"
+              @onClick="cancelAddPhoto"
               class="mr-4"
             />
             <SubmitButton
               label="Añadir"
-              @onClick="addTrack"
-              :disabled="!canAddTrack"
+              @onClick="addPhoto"
+              :disabled="!canAddPhoto"
             />
           </div>
         </div>
       </form>
       <hr />
     </div>
+    <div
+      v-if="selectedPhoto"
+      class="mt-8 px-10"
+    >
+      <p class="text-cs-h3">{{ selectedPhoto.name }}</p>
+      <img
+        :src="selectedPhoto.url"
+        alt="Selected photo"
+        class="w-full"
+      />
+    </div>
   </div>
 </template>
 
 <style scoped>
-  .track-flex {
+  .photo-flex {
     display: flex;
     column-gap: 8px;
     align-items: center;
     overflow-wrap: anywhere;
   }
 
-  .track-wrap {
+  .photo-wrap {
     flex-wrap: nowrap;
   }
 
@@ -303,7 +324,7 @@
     display: none;
   }
 
-  .add-track-grid {
+  .add-photo-grid {
     display: grid;
     column-gap: 16px;
     row-gap: 8px;
@@ -327,13 +348,13 @@
   }
 
   @media (max-width: 640px) {
-    .add-track-grid {
+    .add-photo-grid {
       grid-template-columns: 1fr;
     }
-    .track-grid {
+    .photo-grid {
       grid-template-columns: minmax(70%, max-content) max-content min-content 1fr;
     }
-    .track-wrap {
+    .photo-wrap {
       flex-wrap: wrap;
     }
   }

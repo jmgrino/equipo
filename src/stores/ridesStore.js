@@ -22,10 +22,12 @@ export const useRidesStore = defineStore('ridesStore', () => {
   let rides = ref([])
   let dates = ref([])
   let tracks = ref([])
+  let photos = ref([])
   let users = ref([])
   let validRides = ref(false)
   let validDates = ref(false)
   let validTracks = ref(false)
+  let validPhotos = ref(false)
   let validUsers = ref(false)
   let datesSeq = ref(0)
 
@@ -48,6 +50,21 @@ export const useRidesStore = defineStore('ridesStore', () => {
     let iter = 0
     const maxIter = 100
     while (iter < maxIter && !validTracks.value) {
+      await wait(50)
+      iter++
+    }
+
+    if (iter === maxIter) {
+      return false
+    } else {
+      return true
+    }
+  }
+
+  async function checkValidPhotos() {
+    let iter = 0
+    const maxIter = 100
+    while (iter < maxIter && !validPhotos.value) {
       await wait(50)
       iter++
     }
@@ -111,9 +128,23 @@ export const useRidesStore = defineStore('ridesStore', () => {
         tracks.value.push(track)
       })
 
-      // sortDates(dates.value)
       validTracks.value = true
-      // tracksSeq.value++
+    })
+  }
+
+  function getPhotos() {
+    const q = collection(db, 'photos')
+    const unsubPhotos = onSnapshot(q, querySnapshot => {
+      photos.value = []
+      querySnapshot.forEach(doc => {
+        const photo = {
+          id: doc.id,
+          ...doc.data(),
+        }
+        photos.value.push(photo)
+      })
+
+      validPhotos.value = true
     })
   }
 
@@ -288,6 +319,20 @@ export const useRidesStore = defineStore('ridesStore', () => {
     }
   }
 
+  async function addPhoto(photo) {
+    const docRef = await addDoc(collection(db, 'photos'), photo)
+    return docRef.id
+  }
+
+  async function deletePhoto(photoId) {
+    try {
+      const photoRef = doc(db, 'photos', photoId)
+      await deleteDoc(photoRef)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   function deepCopy(object) {
     let newObject
     try {
@@ -307,10 +352,12 @@ export const useRidesStore = defineStore('ridesStore', () => {
     dates,
     users,
     tracks,
+    photos,
     datesSeq,
     getRides,
     getDates,
     getTracks,
+    getPhotos,
     getUsers,
     validData,
     getRide,
@@ -327,6 +374,9 @@ export const useRidesStore = defineStore('ridesStore', () => {
     checkValidTracks,
     addTrack,
     deleteTrack,
+    checkValidPhotos,
+    addPhoto,
+    deletePhoto,
     deepCopy,
     sortDates,
   }

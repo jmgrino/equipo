@@ -70,7 +70,7 @@
 
     datesData.forEach(date => {
       if (date.noDay === undefined) {
-        console.log('undefined')
+        // console.log('undefined')
         date.noDay = false
       }
     })
@@ -203,28 +203,48 @@
     await nextTick()
     renderDates.value = true
   }
+
+  function uploadFoto() {
+    router.push({ name: 'photo', params: { id: formData.id } })
+  }
 </script>
 
 <template>
   <div class="bg-white shadow-md max-w-7xl mx-auto md:max-w-full md:shadow-none">
-    <div class="flex justify-between items-center pt-5 px-10 gap-x-4">
+    <div class="flex sm:flex-col-reverse justify-between items-left pt-5 px-10 gap-8">
       <template v-if="fetching">
         <h2 class="text-2xl">Esperando datos...</h2>
       </template>
       <template v-else>
         <h2 class="text-4xl font-black">{{ pageTitle }}</h2>
-        <button
+        <!-- <button
           v-show="!isNew"
           class="btn btn-std btn-submit mb-4"
           @click.prevent="manageTracks"
         >
           Tracks
-        </button>
+        </button> -->
+        <div class="flex gap-x-4 self-end">
+          <!-- <SubmitButton
+            label="Foto"
+            @onClick="uploadFoto"
+            class="mr-4"
+          /> -->
+          <!-- <InputFile label="Foto" name="file"/> -->
+          <SubmitButton
+            label="Foto"
+            @onClick="uploadFoto"
+          />
+          <SubmitButton
+            label="Tracks"
+            @onClick="manageTracks"
+          />
+        </div>
       </template>
     </div>
     <FormKit
       type="form"
-      form-class="mt-10 p-10 w-full md:p-5"
+      form-class="mt-5 p-10 w-full md:p-5"
       :actions="false"
       @submit="submitHandler"
       @submit-invalid="showErrors"
@@ -246,7 +266,7 @@
 
         <FormKit
           label="Tipo de ruta"
-          outer-class="col-span-full w-[16.5rem]"
+          outer-class="col-span-full w-[16.5rem] ml-1"
           type="select"
           name="type"
           :options="rideType"

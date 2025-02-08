@@ -1,10 +1,12 @@
 <script setup>
-  import { reactive, ref, computed, nextTick } from 'vue'
+  import { reactive, ref, computed, nextTick, useTemplateRef, onMounted, isProxy, toRaw, toValue } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useRidesStore } from '@/stores/ridesStore'
   import useStorage from '@/composables/useStorage'
   import IconDelete from '@/components/icons/IconDelete.vue'
   import IconDownload from '@/components/icons/IconDownload.vue'
+  import SubmitButton from '@/components/form/SubmitButton.vue'
+  // import InputFile from '@/components/form/InputFile.vue'
 
   const MAX_SIZE_KB = 15000
   const VALID_EXT = '.gpx,.kmz,.kml'
@@ -50,6 +52,13 @@
     pageTitle.value = ride.name
 
     fetching.value = false
+  }
+
+  function showTrackFields(status) {
+    showForm.value = status
+    if (status) {
+      canAddTrack.value = false
+    }
   }
 
   async function addTrack() {
@@ -128,8 +137,7 @@
       if (!checkSize(fileSize)) {
         const maxSizeMbites = Math.trunc(MAX_SIZE_KB / 1000)
         const fileSizeMbites = Math.trunc(fileSize / 1000000)
-        const mByte = fileSizeMbites === 1 ? 'Mbyte' : 'Mbytes'
-        const errorMessage = `Fichero demasiado grande (más de ${fileSizeMbites} ${mByte}). Tamaño máximo ${maxSizeMbites} ${mByte}`
+        const errorMessage = `Fichero demasiado grande (más de ${fileSizeMbites} Mbytes). Tamaño máximo ${maxSizeMbites} Mbytes`
 
         errorMessages.value.push(errorMessage)
         validFile = false
@@ -142,8 +150,6 @@
     if (validFile) {
       canAddTrack.value = true
     }
-
-    showForm.value = true
   }
 
   function checkSize(fileSize) {
@@ -239,47 +245,53 @@
       </template>
     </div>
 
-    <div class="pt-14 px-10">
+    <div
+      v-if="!showForm"
+      class="pt-10 px-10"
+    >
+      <SubmitButton
+        label="Añadir track"
+        class="my-4"
+        @OnClick="showTrackFields(true)"
+      />
+    </div>
+
+    <div
+      v-if="showForm"
+      class="pt-14 px-10"
+    >
       <form class="load-form-grid">
         <InputFile
-          class="mb-4"
-          label="Añadir"
+          label="Cargar track"
           name="track"
           :accept="VALID_EXT"
           @onChange="fileSelected"
         />
+        <InputText
+          name="filename"
+          class="mt-2 sm:col-span-full sm:mt-6"
+          v-model="formData.name"
+        />
+        <p class="col-span-full text-gray-400 w-full word-wrap">{{ formData.file ? 'Fichero: ' + formData.file?.name : '' }}</p>
         <div
-          v-if="showForm"
-          class="overflow-hidden pr-1 sm:col-span-full"
+          v-if="errorMessages.length > 0"
+          class="col-span-full text-16px text-red-600"
         >
-          <InputText
-            name="filename"
-            class="mt-2 sm:mt-6"
-            v-model="formData.name"
-          />
-          <p class="col-span-full text-gray-400 w-full word-wrap">
-            {{ formData.file ? 'Fichero: ' + formData.file?.name : '' }}
+          <p v-for="errorMessage in errorMessages">
+            {{ errorMessage }}
           </p>
-          <div
-            v-if="errorMessages.length > 0"
-            class="col-span-full text-16px text-red-600"
-          >
-            <p v-for="errorMessage in errorMessages">
-              {{ errorMessage }}
-            </p>
-          </div>
-          <div class="col-span-full justify-self-end my-8">
-            <CancelButton
-              label="Cancelar"
-              @onClick="cancelAddTrack"
-              class="mr-4"
-            />
-            <SubmitButton
-              label="Añadir"
-              @onClick="addTrack"
-              :disabled="!canAddTrack"
-            />
-          </div>
+        </div>
+        <div class="col-span-full justify-self-end my-8">
+          <CancelButton
+            label="Cancelar"
+            @onClick="cancelAddTrack"
+            class="mr-4"
+          />
+          <SubmitButton
+            label="Añadir"
+            @onClick="addTrack"
+            :disabled="!canAddTrack"
+          />
         </div>
       </form>
       <hr />
@@ -292,7 +304,7 @@
     display: flex;
     column-gap: 8px;
     align-items: center;
-    overflow-wrap: anywhere;
+    word-wrap: break-word;
   }
 
   .track-wrap {

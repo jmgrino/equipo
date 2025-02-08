@@ -41,6 +41,10 @@
   src: url(../fonts/Cousine-Regular.ttf);
 }
 
+form {
+  font-size: 2rem;
+}
+
 /* ===================== */
 /* Headings */
 /* ===================== */
