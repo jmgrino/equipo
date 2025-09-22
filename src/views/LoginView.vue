@@ -1,7 +1,8 @@
 <script setup>
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, useTemplateRef, nextTick } from 'vue'
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/authStore'
+  import { useValidation } from '@/components/form/useValidation.js'
 
   const authStore = useAuthStore()
   const router = useRouter()
@@ -15,8 +16,7 @@
 
   const submitLabel = ref('Entrar')
   const pageTitle = ref('Login')
-  const isDisabled = ref(false)
-  const errorMessage = ref('')
+  const emailRef = useTemplateRef('email-ref')
 
   const handleIconClick = (node, e) => {
     node.props.suffixIcon = node.props.suffixIcon === 'eye' ? 'eyeClosed' : 'eye'
@@ -24,21 +24,14 @@
   }
 
   async function submitHandler() {
-    isDisabled.value = true
-    errorMessage.value = ''
+    if (formHasErrors(formData)) return
 
     // await wait(1000)
     authStore.login(formData)
 
-    isDisabled.value = false
     if (authStore.errorMessage === '') {
       router.push({ name: 'rides' })
     }
-  }
-
-  function showErrors(node) {
-    // const validations = getValidationMessages(node)
-    errorMessage.value = 'No se pudo enviar, revisa los mensajes'
   }
 
   function wait(ms) {
@@ -48,72 +41,77 @@
   function changePassword() {
     router.push({ name: 'changePassword' })
   }
+
+  const { processElemError, errors, errorMessage, formHasErrors } = useValidation({
+    email: {
+      required: 'El correo electrónico es obligatorio',
+      email: 'El formato del correo electrónico no es válido',
+    },
+    password: {
+      required: 'La contraseña es obligatoria',
+      minChars: 'La contraseña debe tener al menos {setValue} caracteres',
+      pattern: 'Hay caracteres no permitidos en la contraseña',
+    },
+  })
+
+  async function setFocus() {
+    await nextTick() // waits until the DOM is reset and ready
+    emailRef.value.inputRef.focus()
+  }
+
+  setFocus()
 </script>
 
 <template>
   <div class="bg-white shadow-md max-w-2xl mx-auto">
     <h1 class="text-4xl font-black ml-10 pt-10">{{ pageTitle }}</h1>
-    <FormKit
-      type="form"
-      form-class="mt-10 p-10 w-full login-grid"
-      :actions="false"
-      @submit="submitHandler"
-      @submit-invalid="showErrors"
-      :incomplete-message="false"
-      :value="formData"
+    <form
+      class="mt-10 p-10 w-full login-grid"
+      novalidate
+      @submit.prevent="submitHandler"
     >
-      <FormKit
+      <BaseInput
+        ref="email-ref"
+        class=""
         label="Correo electrónico"
-        outer-class=""
         type="email"
-        name="email"
-        placeholder="Nombre de usuario"
-        validation="required"
-        :validation-messages="{ required: 'El Nombre de usuario es obligatorio' }"
-        v-model.trim="formData.email"
+        v-model="formData.email"
+        required
+        error-id="email"
+        :error="errors.email"
+        @elemError="processElemError"
       />
 
-      <FormKit
+      <BaseInputPassword
+        class=""
         label="Contraseña"
-        type="password"
-        prefix-icon="password"
-        suffix-icon="eyeClosed"
-        name="password"
-        placeholder="Contraseña"
-        @suffix-icon-click="handleIconClick"
-        suffix-icon-class="custom-icon-class"
-        validation-visibility="submit"
-        :validation="[['required'], ['*length', 6], ['matches', /^[\x20-\x7E]{6,}$/]]"
-        :validation-messages="{
-          required: 'La contraseña es obligatoria',
-          length: 'La contraseña de tener como minimo 6 caracteres',
-          matches: 'Hay caracters no permitidos en la contraseña',
-        }"
-        v-model.trim="formData.password"
+        v-model="formData.password"
+        minChars="6"
+        pattern="^[\x20-\x7E]{6,}$"
+        required
+        error-id="password"
+        :error="errors.password"
+        @elemError="processElemError"
       />
 
       <div class="send-grid">
-        <FormKit
-          type="submit"
+        <AcceptButton
           :label="submitLabel"
-          outer-class="submit-button button-full-width self-end mb-0"
-          :disabled="isDisabled"
+          type="submit"
         />
         <span class="ml-1 text-[red] text-xl">{{ errorMessage }}</span>
-        <span class="ml-1 -mt-2 text-[red] text-2xl">{{ authStore.errorMessage }}</span>
+        <span class="ml-1 text-[red] text-2xl">{{ authStore.errorMessage }}</span>
         <span
           class="ml-1 mt-2 text-2xl hover:text-color-std-high cursor-pointer"
           @click="changePassword"
           >¿Has olvidado la contraseña?</span
         >
       </div>
-    </FormKit>
+    </form>
   </div>
 </template>
 
 <style>
-  /* grid gap-8 grid-cols-1 grid-rows-4 */
-
   .login-grid {
     display: grid;
     grid-template-columns: 1fr;

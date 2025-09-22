@@ -3,12 +3,10 @@
   import { useRouter } from 'vue-router'
   import { useAuthStore } from '@/stores/authStore'
   import { useValidation } from '@/components/form/useValidation.js'
-  import { useModal } from '@/composables/utilities/useModal'
-  import ModalOverlay from '@/components/utilities/ModalOverlay.vue'
 
   const authStore = useAuthStore()
   const router = useRouter()
-  const modal = useModal()
+  import ModalOverlay from '@/components/utilities/ModalOverlay.vue'
 
   const formData = reactive({
     email: '',
@@ -16,6 +14,8 @@
 
   const submitLabel = ref('Cambiar contraseña')
   const pageTitle = ref('Cambiar contraseña')
+  const showConfirm = ref(true)
+  const isModalOpen = ref(false)
   const modalMessage = ref('')
   const modalButtons = ref([
     {
@@ -25,15 +25,18 @@
   ])
   const emailRef = useTemplateRef('email-ref')
 
-  async function submitHandler() {
+  function submitHandler() {
     if (formHasErrors(formData)) return
 
     // await wait(1000)
     authStore.changePassword(formData)
 
     modalMessage.value = 'Se ha enviado un mensaje de recuperación de contraseña a ' + formData.email
-    modal.showModal(ModalOverlay)
-    const result = await modal.waitAnswer()
+    isModalOpen.value = true
+  }
+
+  function dialogResult(result) {
+    isModalOpen.value = false
     router.push({ name: 'login' })
   }
 
@@ -91,15 +94,13 @@
       </div>
     </form>
   </div>
-
-  <component
-    v-if="modal.show.value"
-    :is="modal.component.value"
+  <ModalOverlay
+    :open-dialog.sync="isModalOpen"
     header="Restaurar contraseña"
     :paragraph="modalMessage"
     :buttons="modalButtons"
-    @close="modal.hideModal"
-  />
+    @result="dialogResult"
+  ></ModalOverlay>
 </template>
 
 <style scoped>

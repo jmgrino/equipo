@@ -245,16 +245,16 @@
               </IconDownload>
             </a> -->
           </div>
+          <div class="col-span-full border-b-2 mb-4"></div>
         </template>
       </template>
     </div>
 
     <div class="pt-14 px-10">
       <form class="load-form-grid">
-        <InputFile
+        <BaseInputFile
           class="mb-4"
           label="Añadir"
-          name="photo"
           :accept="VALID_EXT"
           @onChange="fileSelected"
         />
@@ -262,7 +262,7 @@
           v-if="showForm"
           class="overflow-hidden pr-1 sm:col-span-full"
         >
-          <InputText
+          <BaseInput
             name="filename"
             class="mt-2 sm:mt-6"
             v-model="formData.name"
@@ -284,7 +284,7 @@
               @onClick="cancelAddPhoto"
               class="mr-4"
             />
-            <SubmitButton
+            <AcceptButton
               label="Añadir"
               @onClick="addPhoto"
               :disabled="!canAddPhoto"

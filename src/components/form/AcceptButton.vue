@@ -4,51 +4,35 @@
       type: String,
       required: true,
     },
-    name: {
+    displayClass: {
       type: String,
-      required: true,
+      default: 'btn',
     },
-    accept: {
+    type: {
       type: String,
-      required: false,
+      default: 'button',
     },
   })
 
-  const emit = defineEmits(['onChange'])
+  const emit = defineEmits(['onClick'])
 
-  function getFile(e) {
-    emit('onChange', e)
-  }
 </script>
 
 <template>
-  <div class="input-container">
-    <input
-      type="file"
-      :name="name"
-      :id="name"
-      class="uploadFile"
-      :accept="accept"
-      @change="getFile"
-    />
-    <label
-      :for="name"
-      class="btn"
-      >{{ label }}</label
-    >
-  </div>
+  <button
+    v-bind="$attrs"
+    :type="type"
+    :class="displayClass"
+    @click="emit('onClick')"
+  >
+    {{ label }}
+  </button>
 </template>
 
 <style scoped>
-  .uploadFile {
-    display: none;
-  }
   .btn,
   .btn:link,
   .btn:visited {
-    display: inline-block;
-    cursor: pointer;
-    text-align: center;
     align-items: center;
     border-style: solid;
     border-width: 2px 2px 2px 2px;
@@ -63,6 +47,11 @@
     line-height: 1.5;
     min-width: 100px;
     padding: 4px 16px 5px 16px;
+  }
+  .btn:disabled {
+    background-color: #f5cba7;
+    border-color: #f5cba7;
+    pointer-events: none;
   }
 
   .btn:hover,

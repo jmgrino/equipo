@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref } from 'vue'
   import { RouterView } from 'vue-router'
   import NavBar from '@/components/layout/NavBar.vue'
   import { useAuthStore } from '@/stores/authStore'
@@ -46,10 +46,6 @@
 </script>
 
 <template>
-  <!-- <LoadingScreen
-    :isLoading="true"
-    :message="message"
-  /> -->
   <LoadingScreen
     :isLoading="isLoading"
     :message="message"

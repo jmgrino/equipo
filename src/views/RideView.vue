@@ -220,6 +220,36 @@
   function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
+
+  function mensualChanged(checked) {
+    let month
+    let year
+    let newDate
+
+    if (checked) {
+      if (formData.date) {
+        month = +formData.date.substring(5, 7)
+        year = +formData.date.substring(0, 4)
+        newDate = new Date(year, month, 1)
+      } else {
+        const today = new Date()
+        month = today.getMonth() + 1
+        year = today.getFullYear()
+        newDate = new Date(year, month, 1)
+      }
+
+      newDate.setDate(newDate.getDate() - 1)
+
+      let strMonth = newDate.getMonth() + 1
+      strMonth = month.toString().padStart(2, '0')
+      let strYear = newDate.getFullYear()
+      let strDay = newDate.getDate().toString()
+
+      formData.date = strYear + '-' + strMonth + '-' + strDay
+
+      // forceRender()
+    }
+  }
 </script>
 
 <template>
@@ -240,7 +270,7 @@
           label="Volver"
           @onClick="router.push({ name: 'rides' })"
         />
-        <SubmitButton
+        <AcceptButton
           v-if="routeOnwer"
           label="Editar"
           @onClick="editRide"
@@ -254,7 +284,10 @@
       <span class="label text-cs-h3">Nombre:</span>
       <span class="text-cs-h3 sm:font-bold">{{ ride.name }}</span>
       <span class="label text-cs-h3">Tipo:</span>
-      <span class="text-cs-h3"><span class="hidden sm:inline">- </span>{{ capitalize(ride.type) }}</span>
+      <span class="text-cs-h3"
+        ><span class="hidden sm:inline">- </span>{{ ride.type }} {{ ride.distance ? `${ride.distance} km` : '' }}
+        {{ ride.elevation ? `+${ride.elevation} m` : '' }}</span
+      >
       <span class="text-cs-h3 sm:underline sm:underline-offset-2">Fechas:</span>
       <div class="dates-grid-layout text-20px">
         <template v-if="renderDates">
@@ -306,32 +339,31 @@
           @submit.prevent="addDate"
           class="add-date-grid"
         >
-          <InputDate
+          <BaseInputDate
             label="Fecha"
-            name="date"
+            elem-id="date"
             v-model="formData.date"
           />
-          <InputText
+          <BaseInput
             label="Dias"
             type="number"
-            name="days"
+            elem-id="days"
             width="50px"
             v-model="formData.days"
           />
-          <InputCheckbox
-            zclass="sm:col-span-full"
+          <BaseCheckbox
             label="Mensual"
-            name="noDay"
+            elem-id="noDay"
             v-model="formData.noDay"
-            :required="true"
+            @inputChanged="mensualChanged"
           />
-          <div class="col-span-full justify-self-end mt-8">
+          <div class="col-start-1 col-end-4 justify-self-end mt-8">
             <CancelButton
               label="Cancelar"
               @onClick="showDateFields(false)"
               class="mr-4"
             />
-            <SubmitButton
+            <AcceptButton
               label="Añadir"
               type="submit"
             />
@@ -396,17 +428,6 @@
         />
       </div>
     </div>
-    <!-- <div
-      v-if="selectedPhoto"
-      class="mt-8 px-10"
-    >
-      <p class="text-cs-h3">{{ selectedPhoto.name }}</p>
-      <img
-        :src="selectedPhoto.url"
-        alt="Selected photo"
-        class="w-full"
-      />
-    </div> -->
   </div>
 </template>
 
@@ -441,7 +462,7 @@
     row-gap: 8px;
     align-items: center;
     justify-items: start;
-    grid-template-columns: max-content max-content 1fr;
+    grid-template-columns: max-content max-content max-content 1fr;
   }
 
   .track-flex {

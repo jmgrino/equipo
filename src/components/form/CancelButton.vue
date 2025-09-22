@@ -4,7 +4,7 @@
       type: String,
       required: true,
     },
-    type: {
+    displayClass: {
       type: String,
       default: 'btn',
     },
@@ -14,8 +14,9 @@
 
 <template>
   <button
+    v-bind="$attrs"
     type="button"
-    :class="type"
+    :class="displayClass"
     @click="emit('onClick')"
   >
     {{ label }}

@@ -302,6 +302,8 @@
     grid-template-columns: 1fr min-content;
     grid-template-rows: auto auto;
     column-gap: 4px;
+    /* outline: 1px dashed var(--color-std-high);
+    outline-offset: -4px; */
   }
 
   .dates-grid {

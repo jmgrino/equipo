@@ -1,9 +1,8 @@
 <script setup>
-  import { reactive, ref, watch, onMounted } from 'vue'
+  import { reactive, ref, watch } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useAuthStore } from '@/stores/authStore'
-  // import { getValidationMessages } from '@formkit/validation'
-  // import IconClose from '@/components/icons/IconClose.vue'
+  import { useValidation } from '@/components/form/useValidation.js'
 
   const authStore = useAuthStore()
   const router = useRouter()
@@ -12,7 +11,6 @@
   const submitLabel = ref('')
   const pageTitle = ref('')
   const isDisabled = ref(false)
-  const errorMessage = ref('')
 
   submitLabel.value = 'Actualizar'
 
@@ -66,11 +64,13 @@
     stone: '#d6d3d1',
   })
 
-  getUser(route.params.id)
+  const userId = route.params.id
+  getUser(userId)
 
   async function getUser(id) {
     const user = await authStore.getUser(id)
-    pageTitle.value = user.email
+    // console.log(user)
+    pageTitle.value = user.name
     Object.assign(formData, user)
   }
 
@@ -99,19 +99,17 @@
   )
 
   async function submitHandler() {
+    if (formHasErrors()) return
+
     isDisabled.value = true
     errorMessage.value = ''
 
     const { stdColor, ...userData } = formData
-    await authStore.updateUser(route.params.id, userData)
+
+    await authStore.updateUser(userId, userData)
 
     isDisabled.value = false
     router.push({ name: 'user' })
-  }
-
-  function showErrors(node) {
-    // const validations = getValidationMessages(node)
-    errorMessage.value = 'No se pudo enviar, revisa los mensajes'
   }
 
   function cancelHandler() {
@@ -121,96 +119,94 @@
   function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
+
+  const { processElemError, errors, errorMessage, formHasErrors } = useValidation({
+    name: {
+      required: 'El nombre es obligatorio',
+      maxChars: 'El nombre no puede tener mas de {setValue}  caracteres',
+    },
+    shortName: {
+      required: 'La abreviatura es obligatorio',
+      numChars: 'La abreviatura debe ser de tres letras',
+    },
+  })
 </script>
 
 <template>
-  <div class="bg-white shadow-md max-w-7xl mx-auto md:max-w-full md:shadow-none">
+  <div class="bg-white shadow-md max-w-5xl mx-auto md:max-w-full md:shadow-none">
     <h1 class="text-4xl font-black ml-10 pt-10">{{ pageTitle }}</h1>
-    <FormKit
-      type="form"
-      form-class="form-class"
-      :actions="false"
-      @submit="submitHandler"
-      @submit-invalid="showErrors"
-      validation-visibility="submit"
-      :incomplete-message="false"
-      :value="formData"
+    <form
+      class="mt-5 p-10 w-full form-grid"
+      novalidate
+      @submit.prevent="submitHandler"
     >
-      <FormKit
+      <BaseInput
+        class=""
         label="Nombre"
-        outer-class="col-span-2"
-        input-class=""
-        type="text"
-        name="name"
-        placeholder="Nombre"
-        validation="required"
-        :validation-messages="{ required: 'El Nombre es obligatorio' }"
-        v-model.trim="formData.name"
+        v-model="formData.name"
+        maxChars="20"
+        width="200px"
+        required
+        error-id="name"
+        :error="errors.name"
+        @elemError="processElemError"
       />
-
-      <FormKit
+      <BaseInput
+        class=""
         label="Abreviatura"
-        outer-class="col-span-2"
-        input-class="w-32"
-        type="text"
-        name="shortName"
-        placeholder="Abreviatura"
+        v-model="formData.shortName"
+        numChars="3"
         maxlength="3"
-        validation="required|length:3"
-        :validation-messages="{ required: 'La abreviatura es obligatoria', length: 'La abreviatura debe ser de tres lettras' }"
-        v-model.trim="formData.shortName"
+        width="60px"
+        required
+        error-id="shortName"
+        :error="errors.shortName"
+        @elemError="processElemError"
       />
-
-      <FormKit
+      <BaseSelect
+        class="col-start-1"
         label="Elige un color"
-        outer-class="sm:col-span-2"
-        type="select"
-        name="colorstd"
         :options="stdColorNames"
-        placeholder="Selecciona un color"
-        v-model.trim="formData.stdColor"
+        v-model="formData.stdColor"
+        width="200px"
       />
 
-      <FormKit
-        label="Personalizar tu color"
-        outer-class="sm:col-span-2"
-        inner-class="h-15 w-20 p-0"
-        type="color"
-        name="color"
-        placeholder="Color de la abreviatura"
-        v-model.trim="formData.color"
+      <BaseInputColor
+        label="Personaliza tu color"
+        v-model="formData.color"
+        class=""
       />
 
-      <div class="col-span-2 justify-self-end pt-8 grid grid-cols-2 gap-x-4">
-        <FormKit
-          type="button"
+      <div class="col-span-full justify-self-end pt-8 grid grid-cols-2 gap-x-4 mt-8">
+        <CancelButton
           label="Cancelar"
-          outer-class="cancel-button"
-          input-class=""
-          @click="cancelHandler"
-          :disabled="isDisabled"
+          @onClick="cancelHandler"
+        />
+        <AcceptButton
+          :label="submitLabel"
+          type="submit"
         />
 
-        <FormKit
-          type="submit"
-          :label="submitLabel"
-          outer-class="submit-button"
-          :disabled="isDisabled"
-        />
         <span class="col-span-2 p-2 text-[red] text-xl">{{ errorMessage }}</span>
       </div>
-    </FormKit>
+    </form>
   </div>
 </template>
 
 <style scoped>
-  .form-class {
+  .form-grid {
     display: grid;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: max-content max-content 1fr;
     grid-template-rows: repeat(4, min-content);
     gap: 2rem;
     margin-top: 2.5rem;
     padding: 2.5rem;
     width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

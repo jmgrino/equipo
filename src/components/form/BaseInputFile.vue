@@ -1,42 +1,50 @@
 <script setup>
+  import { useUniqueID } from './useUniqueID'
+
   const props = defineProps({
     label: {
       type: String,
       required: true,
     },
-    style: {
-      type: String,
-      default: 'btn',
-    },
-    type: {
-      type: String,
-      default: 'button',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-      // Parent -> :disabled="true"
-    },
   })
 
-  const emit = defineEmits(['onClick'])
+  const emit = defineEmits(['onChange'])
+
+  // const model = defineModel()
+  const uuid = useUniqueID().getID()
+
+  function getFile(e) {
+    emit('onChange', e)
+  }
 </script>
 
 <template>
-  <button
-    :type="type"
-    :class="style"
-    :disabled="disabled"
-    @click="emit('onClick')"
-  >
-    {{ label }}
-  </button>
+  <div class="input-container">
+    <input
+      v-bind="$attrs"
+      :id="uuid"
+      type="file"
+      class="uploadFile"
+      @change="getFile"
+    />
+    <label
+      :for="uuid"
+      class="btn"
+      >{{ label }}</label
+    >
+  </div>
 </template>
 
 <style scoped>
+  .uploadFile {
+    display: none;
+  }
   .btn,
   .btn:link,
   .btn:visited {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
     align-items: center;
     border-style: solid;
     border-width: 2px 2px 2px 2px;
@@ -51,11 +59,6 @@
     line-height: 1.5;
     min-width: 100px;
     padding: 4px 16px 5px 16px;
-  }
-  .btn:disabled {
-    background-color: #f5cba7;
-    border-color: #f5cba7;
-    pointer-events: none;
   }
 
   .btn:hover,

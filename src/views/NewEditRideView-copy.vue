@@ -1,11 +1,10 @@
 <script setup>
-  import { reactive, ref, nextTick, useTemplateRef } from 'vue'
+  import { reactive, ref, nextTick } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useRidesStore } from '@/stores/ridesStore'
   import { useAuthStore } from '@/stores/authStore'
   import IconDelete from '@/components/icons/IconDelete.vue'
   import IconX from '@/components/icons/IconX.vue'
-  import { useModal } from '@/composables/utilities/useModal'
   import ModalOverlay from '@/components/utilities/ModalOverlay.vue'
   import { useValidation } from '@/components/form/useValidation.js'
 
@@ -13,7 +12,6 @@
   const authStore = useAuthStore()
   const router = useRouter()
   const route = useRoute()
-  const modal = useModal()
 
   const initialValues = {
     name: '',
@@ -36,9 +34,9 @@
   const isDisabled = ref(false)
   const isNew = ref(false)
   const fetching = ref(false)
-  const emailRef = useTemplateRef('email-ref')
   let timeoutID
 
+  const isModalOpen = ref(false)
   const modalRide = ref({})
   const modalButtons = ref([
     {
@@ -128,17 +126,10 @@
     router.back()
   }
 
-  async function deleteRide() {
+  function deleteRide() {
     modalRide.value = formData
     modalRide.value.id = route.params.id
-
-    modal.showModal(ModalOverlay)
-    const result = await modal.waitAnswer()
-
-    if (result) {
-      ridesStore.deleteRide(modalRide.value.id)
-      router.push({ name: 'rides' })
-    }
+    isModalOpen.value = true
   }
 
   function addDate() {
@@ -189,6 +180,14 @@
       formData.dates[index].canceled = true
     }
     forceRender()
+  }
+
+  function dialogResult(result) {
+    isModalOpen.value = false
+    if (result) {
+      ridesStore.deleteRide(modalRide.value.id)
+      router.push({ name: 'rides' })
+    }
   }
 
   function manageTracks() {
@@ -251,13 +250,6 @@
       badInput: 'Fecha invalida',
     },
   })
-
-  async function setFocus() {
-    await nextTick() // waits until the DOM is reset and ready
-    emailRef.value.inputRef.focus()
-  }
-
-  setFocus()
 </script>
 
 <template>
@@ -290,7 +282,6 @@
       <div class="user-view-grid">
         <BaseInput
           class="col-span-full"
-          ref="email-ref"
           label="Nombre"
           v-model="formData.name"
           maxChars="80"
@@ -449,14 +440,13 @@
       </div>
     </form>
   </div>
-  <component
-    v-if="modal.show.value"
-    :is="modal.component.value"
+  <ModalOverlay
+    :open-dialog.sync="isModalOpen"
     :header="modalRide.name"
     paragraph="¿Seguro que quieres borrar esta ruta?"
     :buttons="modalButtons"
-    @close="modal.hideModal"
-  />
+    @result="dialogResult"
+  ></ModalOverlay>
 </template>
 
 <style scoped>

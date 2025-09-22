@@ -1,5 +1,11 @@
 <script setup>
+  import { ref, computed, onMounted, watch } from 'vue'
+
   const props = defineProps({
+    openDialog: {
+      type: Boolean,
+      required: true,
+    },
     header: {
       type: String,
       default: 'Titulo',
@@ -14,20 +20,41 @@
     },
   })
 
-  const emit = defineEmits(['close'])
+  const emit = defineEmits(['result'])
+
+  let isOpen = ref(false)
+
+  onMounted(() => {
+    isOpen.value = props.openDialog
+  })
+
+  watch(
+    () => props.openDialog,
+    newValue => {
+      isOpen.value = newValue
+    }
+  )
+
+  const isModalVisible = computed(() => {
+    return isOpen.value
+  })
+
+  const onToggle = () => {
+    isOpen.value = !isOpen.value
+  }
 
   const onResult = answer => {
-    emit('close', answer)
+    emit('result', answer)
   }
 </script>
 
 <template>
-  <teleport to="#modal">
+  <teleport to="body">
     <transition name="fade">
-      <div>
-        <div class="fixed bg-black opacity-70 inset-0 z-0 pointer-events-none"></div>
+      <div v-if="isModalVisible">
+        <div class="absolute bg-black opacity-70 inset-0 z-0"></div>
         <div
-          class="w-full max-w-lg p-3 fixed bottom-1/4 left-1/2 -translate-x-1/2 mx-auto my-auto rounded-xl shadow-lg bg-white"
+          class="w-full max-w-lg p-3 absolute bottom-6 left-1/2 -translate-x-1/2 mx-auto my-auto rounded-xl shadow-lg bg-white"
         >
           <div>
             <div class="text-center p-3 flex-auto justify-center leading-6">
