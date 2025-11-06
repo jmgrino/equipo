@@ -210,7 +210,7 @@
 </script>
 
 <template>
-  <div class="ride-layout text-16px p-2 border-b border-color-std">
+  <div class="ride-layout text-16px leading-16px p-2 border-b border-color-std">
     <div class="row-start-1 col-start-1">
       <span class="font-semibold mr-2">{{ ride.name }}</span>
       <IconMountain
@@ -263,7 +263,7 @@
               key="user.id"
             >
               <input
-                class="text-cs-std mr-1"
+                class="text-cs-std leading-cs-std mr-1"
                 type="checkbox"
                 :id="user.id"
                 :value="user.id"
@@ -272,12 +272,12 @@
               />
               <label
                 :for="user.id"
-                class="text-cs-std sm:hidden"
+                class="text-cs-std leading-cs-std sm:hidden"
                 >{{ user.name }}</label
               >
               <label
                 :for="user.id"
-                class="text-cs-std hidden sm:inline"
+                class="text-cs-std leading-cs-std hidden sm:inline"
                 >{{ user.shortName }}</label
               >
             </div>

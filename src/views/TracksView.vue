@@ -204,7 +204,7 @@
             class="track-flex mb-4"
             :class="{ 'track-wrap': isWrap }"
           >
-            <span class="text-cs-h3">{{ track.name }}</span>
+            <span class="text-cs-h3 leading-cs-h3">{{ track.name }}</span>
             <div
               v-if="track.confirm"
               class="flex-none"
@@ -262,7 +262,7 @@
           </p>
           <div
             v-if="errorMessages.length > 0"
-            class="col-span-full text-16px text-red-600"
+            class="col-span-full text-16px leading-16px text-red-600"
           >
             <p v-for="errorMessage in errorMessages">
               {{ errorMessage }}

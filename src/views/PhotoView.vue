@@ -212,9 +212,9 @@
             class="photo-flex mb-4"
             :class="{ 'photo-wrap': isWrap }"
           >
-            <!-- <span class="text-cs-h3 grow-0">{{ photo.name }}</span> -->
+            <!-- <span class="text-cs-h3 leading-cs-h3 grow-0">{{ photo.name }}</span> -->
             <span
-              class="text-cs-h3 cursor-pointer hover:text-color-std-high"
+              class="text-cs-h3 leading-cs-h3 cursor-pointer hover:text-color-std-high"
               @click="displayPhoto(photo)"
               >{{ photo.name }}</span
             >
@@ -275,7 +275,7 @@
           </p>
           <div
             v-if="errorMessages.length > 0"
-            class="col-span-full text-16px text-red-600"
+            class="col-span-full text-16px leading-16px text-red-600"
           >
             <p v-for="errorMessage in errorMessages">
               {{ errorMessage }}
@@ -301,7 +301,7 @@
       v-if="selectedPhoto"
       class="mt-8 px-10"
     >
-      <p class="text-cs-h3">{{ selectedPhoto.name }}</p>
+      <p class="text-cs-h3 leading-cs-h3">{{ selectedPhoto.name }}</p>
       <img
         :src="selectedPhoto.url"
         alt="Selected photo"

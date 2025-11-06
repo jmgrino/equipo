@@ -82,7 +82,7 @@
 <template>
   <div class="bg-white shadow-md max-w-7xl mx-auto p-4 sm:max-w-full sm:shadow-none">
     <div class="header-grid">
-      <span class="text-cs-h4 text-color-std-high-tint sm:row-start-2">Herramientas</span>
+      <span class="text-cs-h2 leading-cs-h2 text-color-std-high-tint sm:row-start-2">Herramientas</span>
 
       <div class="justify-self-end flex gap-5 sm:row-start-1">
         <CancelButton
@@ -92,13 +92,13 @@
       </div>
     </div>
     <div class="tools-grid mt-12">
-      <h3 class="text-cs-h3">Limpiar base de datos</h3>
+      <h3 class="text-cs-h3 leading-cs-h3">Limpiar base de datos</h3>
       <AcceptButton
         label="Ejecutar"
         @onClick="cleanDatabase"
       />
       <p
-        class="working text-cs-h3 hidden"
+        class="working text-cs-h3 leading-cs-h3 hidden"
         :class="blinkText"
       >
         Limpiando base de datos...

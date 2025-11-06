@@ -238,7 +238,7 @@
         title="Desapuntarme de la ruta"
         @click="removeSpace"
       />
-      <div class="text-cs-h2">{{ dateWidth }}</div>
+      <div class="text-cs-h2 leading-cs-h2">{{ dateWidth }}</div>
       <IconPlus
         class="icon"
         size="4.0rem"
@@ -249,7 +249,7 @@
         type="checkbox"
         class="ml-4"
         v-model="shortDate"
-      /><span class="text-cs-h4">Formato de fecha reducido</span>
+      /><span class="text-cs-h4 leading-cs-h4">Formato de fecha reducido</span>
     </div>
     <div
       v-if="authStore.showModSpace"
@@ -273,13 +273,13 @@
       <div v-for="(ride, index) in filteredRides">
         <h3
           v-if="index === 0"
-          class="text-cs-h3 text-blue-500 border-b-2 border-color-std"
+          class="text-cs-h3 leading-cs-h3 text-blue-500 border-b-2 border-color-std"
         >
           {{ ride.monthName }}
         </h3>
         <h3
           v-if="index > 0 && ride.monthName"
-          class="text-cs-h3 text-blue-500 border-b-2 border-color-std pt-4"
+          class="text-cs-h3 leading-cs-h3 text-blue-500 border-b-2 border-color-std pt-4"
         >
           {{ ride.monthName }}
         </h3>

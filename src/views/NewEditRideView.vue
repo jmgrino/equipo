@@ -365,7 +365,7 @@
               v-if="date.message"
               class="sm:col-span-full col-span-2"
             >
-              <span class="inline-block text-[red] text-cs-std mr-4 mb-2">Hay ciclistas apuntados</span>
+              <span class="inline-block text-[red] text-cs-std leading-cs-std mr-4 mb-2">Hay ciclistas apuntados</span>
               <AcceptButton
                 @click="confirmDeleteDate(index)"
                 label="Confirmar borrado"

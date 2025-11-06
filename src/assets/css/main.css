@@ -1,5 +1,96 @@
 @import './base.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* === Define desktop-first variants === */
+@custom-variant sm (@media (max-width: 480px));
+@custom-variant md (@media (max-width: 768px));
+@custom-variant lg (@media (max-width: 976px));
+@custom-variant xl (@media (max-width: 1440px));
+@custom-variant 2xl (@media (max-width: 1535px));
+
+@theme {
+  /* === Your custom theme values === */
+
+  --text-10px: 1rem;
+  --leading-10px: 1.2rem;
+  --text-16px: 1.6rem;
+  --leading-16px: 2rem;
+  --text-20px: 2.0rem;
+  --leading-20px: 2.6rem;
+  --text-24px: 2.4rem;
+  --leading-24px: 3rem;
+  --text-32px: 3.2rem;
+  --leading-32px: 3.8rem;
+  --text-48px: 4.8rem;
+  --leading-48px: 5.8rem;
+  --text-64px: 6.4rem;
+  --leading-64px: 7.4rem;
+
+  --text-cs-std: 1.6rem;
+  --leading-cs-std: 1.8rem;
+  --text-cs-small: 1.2rem;
+  --leading-cs-small: 1.4rem;
+  --text-cs-h1: 3.2rem;
+  --leading-cs-h1: 3.6rem;
+  --text-cs-h2: 2.4rem;
+  --leading-cs-h2: 3rem;
+  --text-cs-h3: 2rem;
+  --leading-cs-h3: 2.8rem;
+  --text-cs-h4: 1.6rem;
+  --leading-cs-h4: 2.2rem;
+
+  --color-std: #5A7687;
+  --color-std-shade: #4f6877;
+  --color-std-tint: #6b8493;
+
+  --color-std-high: #e67e22;
+  --color-std-high-shade: #cf711f;
+  --color-std-high-tint: #d6a15e;
+
+  --color-std-background-old: #faf5ed;
+  --color-std-background: #FDFDFD;
+  --color-std-text: #5A7687;
+}
+
+
+@layer utilities {
+  /* === Desktop-first container === */
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  /* 🖥️ Large screens — default */
+  .container {
+    max-width: 1440px; /* you can adjust this if needed */
+  }
+
+  /* 📱 Shrinking down from large → small */
+  @media (max-width: 1440px) {
+    .container {
+      max-width: 1440px;
+    }
+  }
+
+  @media (max-width: 976px) {
+    .container {
+      max-width: 976px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      max-width: 768px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      max-width: 480px;
+    }
+  }
+}
+
+

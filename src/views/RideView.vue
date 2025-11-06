@@ -300,12 +300,12 @@
     <div class="header-grid">
       <span
         v-if="fetching"
-        class="text-cs-h4 text-color-std-high-tint sm:row-start-2"
+        class="text-cs-h4 leading-cs-h4 text-color-std-high-tint sm:row-start-2"
         >Esperando datos...</span
       >
       <span
         v-else
-        class="text-cs-h4 text-color-std sm:row-start-2"
+        class="text-cs-h4 leading-cs-h4 text-color-std sm:row-start-2"
         >Ruta creada por {{ createdBy.name }}</span
       >
       <div class="justify-self-end flex gap-5 sm:row-start-1">
@@ -328,15 +328,15 @@
       v-if="!fetching"
       class="user-view-grid mt-6"
     >
-      <span class="label text-cs-h3">Nombre:</span>
-      <span class="text-cs-h3 sm:font-bold">{{ ride.name }}</span>
-      <span class="label text-cs-h3">Tipo:</span>
-      <span class="text-cs-h3"
+      <span class="label text-cs-h3 leading-cs-h3">Nombre:</span>
+      <span class="text-cs-h3 leading-cs-h3 sm:font-bold">{{ ride.name }}</span>
+      <span class="label text-cs-h3 leading-cs-h3">Tipo:</span>
+      <span class="text-cs-h3 leading-cs-h3"
         ><span class="hidden sm:inline">- </span>{{ ride.type }} {{ ride.distance ? `${ride.distance} km` : '' }}
         {{ ride.elevation ? `+${ride.elevation} m` : '' }}</span
       >
-      <span class="text-cs-h3 sm:underline sm:underline-offset-2">Fechas:</span>
-      <div class="dates-grid-layout text-20px">
+      <span class="text-cs-h3 leading-cs-h3 sm:underline sm:underline-offset-2">Fechas:</span>
+      <div class="dates-grid-layout text-20px leading-20px">
         <template v-if="renderDates">
           <div
             v-for="(date, index) in dates"
@@ -357,7 +357,7 @@
               v-if="date.message"
               class="sm:col-start-1 sm:col-span-3"
             >
-              <p class="text-cs-std">No se puede borrar porque hay ciclistas apuntados</p>
+              <p class="text-cs-std leading-cs-std">No se puede borrar porque hay ciclistas apuntados</p>
             </div>
             <div
               v-else-if="date.confirm"
@@ -386,7 +386,7 @@
             </div>
             <div
               v-if="date.userNames"
-              class="font-sans text-cs-std -mt-2 col-span-full"
+              class="font-sans text-cs-std leading-cs-std -mt-2 col-span-full"
             >
               <span>({{ date.userNames.join(', ') }})</span>
             </div>
@@ -440,24 +440,24 @@
       </div>
       <span
         v-if="ride.note"
-        class="text-cs-h3"
+        class="text-cs-h3 leading-cs-h3"
         >Notas:</span
       >
       <span
         v-if="ride.note"
-        class="text-cs-h3 notes"
+        class="text-cs-h3 leading-cs-h3 notes"
         >{{ ride.note }}</span
       >
       <template v-if="tracks.length > 0">
-        <span class="text-cs-h3 mt-4 sm:underline sm:underline-offset-2">Tracks:</span>
-        <!-- <p class="text-cs-h1 text-red-600">Modificar tracks grid</p> -->
+        <span class="text-cs-h3 leading-cs-h3 mt-4 sm:underline sm:underline-offset-2">Tracks:</span>
+        <!-- <p class="text-cs-h1 leading-cs-h1 text-red-600">Modificar tracks grid</p> -->
         <div class="col-start-2 sm:col-start-1 mt-4 sm:mt-0">
           <div
             v-for="track in tracks"
             class="track-flex"
           >
-            <span class="text-cs-h3 self-start hidden sm:block">-</span>
-            <span class="text-cs-h3">{{ track.name }}</span>
+            <span class="text-cs-h3 leading-cs-h3 self-start hidden sm:block">-</span>
+            <span class="text-cs-h3 leading-cs-h3">{{ track.name }}</span>
             <a
               :href="track.url"
               class="self-end pb-2"
@@ -479,7 +479,7 @@
         v-for="photo in photos"
         class="mt-8"
       >
-        <p class="text-cs-h3">{{ photo.name }}</p>
+        <p class="leading-cs-h3">{{ photo.name }}</p>
         <img
           :src="photo.url"
           :alt="photo.name"

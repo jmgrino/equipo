@@ -77,8 +77,8 @@
 
     <nav class="main-nav">
       <ul class="main-nav-list">
-        <h3 class="text-cs-h4 md:mt-4 hidden md:block">Versión {{ versionNumber }}</h3>
-        <li class="hidden sm:list-item">
+        <h3 class="text-cs-h4 leading-cs-h4 md:mt-4 hidden md:block">Versión {{ versionNumber }}</h3>
+        <li class="hidden md:list-item">
           <a
             class="main-nav-link"
             @click="modSpace"

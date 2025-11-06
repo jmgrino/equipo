@@ -21,6 +21,8 @@
 </template>
 
 <style scoped>
+  @reference "tailwindcss"
+  
   .owner {
     @apply text-blue-700 font-bold;
   }
