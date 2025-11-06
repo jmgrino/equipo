@@ -43,8 +43,8 @@
                   clip-rule="evenodd"
                 />
               </svg>
-              <h2 class="text-cs-h2 font-bold py-4">{{ header }}</h2>
-              <p class="text-cs-std text-gray-500 px-8">{{ paragraph }}</p>
+              <h2 class="text-cs-h2 leading-cs-h2 font-bold py-4">{{ header }}</h2>
+              <p class="text-cs-h3 leading-cs-h3 text-gray-500 px-8 mt-4">{{ paragraph }}</p>
             </div>
             <div class="p-3 mt-2 text-center space-x-4">
               <button

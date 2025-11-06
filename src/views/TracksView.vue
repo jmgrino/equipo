@@ -2,7 +2,7 @@
   import { reactive, ref, computed, nextTick } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useRidesStore } from '@/stores/ridesStore'
-  import useStorage from '@/composables/useStorage'
+  import useStorage from '@/stores/useStorage'
   import IconDelete from '@/components/icons/IconDelete.vue'
   import IconDownload from '@/components/icons/IconDownload.vue'
 

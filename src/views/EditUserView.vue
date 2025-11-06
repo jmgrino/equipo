@@ -69,7 +69,6 @@
 
   async function getUser(id) {
     const user = await authStore.getUser(id)
-    // console.log(user)
     pageTitle.value = user.name
     Object.assign(formData, user)
   }
@@ -166,7 +165,7 @@
       <BaseSelect
         class="col-start-1"
         label="Elige un color"
-        :options="stdColorNames"
+        :options="Object.keys(stdColorNames)"
         v-model="formData.stdColor"
         width="200px"
       />

@@ -61,7 +61,6 @@
       if (inputElem.hasAttribute('required')) {
         const unwatch = watchEffect(() => {
           if (model.value && errorStatus.required.errorValue) {
-            // console.log('Delete required error')
             errorInfo = {
               errorName: 'required',
               errorValue: false,
@@ -77,7 +76,6 @@
       }
 
       if (inputElem.hasAttribute('required')) {
-        // console.log('set ini required', inputElem.validity.valueMissing)
         errorInfo = {
           errorName: 'required',
           errorValue: inputElem.validity.valueMissing,
@@ -156,8 +154,6 @@
         LastErrorReported = 'any'
       }
     }
-
-    // console.log('errorStatus', errorId, errorStatus)
   }
 </script>
 

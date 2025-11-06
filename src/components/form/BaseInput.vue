@@ -47,9 +47,7 @@
   const uuid = useUniqueID().getID()
 
   const inputRef = useTemplateRef('input-ref')
-  defineExpose({inputRef})
-
-  // console.log('UseId', useId())
+  defineExpose({ inputRef })
 
   let errorStatus = {
     maxChars: {
@@ -98,7 +96,6 @@
       if (inputElem.hasAttribute('required')) {
         const unwatch = watchEffect(() => {
           if (model.value && errorStatus.required.errorValue) {
-            // console.log('Delete required error')
             errorInfo = {
               errorName: 'required',
               errorValue: false,
@@ -114,7 +111,6 @@
       }
 
       if (inputElem.hasAttribute('required')) {
-        // console.log('set ini required', inputElem.validity.valueMissing)
         errorInfo = {
           errorName: 'required',
           errorValue: inputElem.validity.valueMissing,
@@ -207,7 +203,6 @@
         }
 
         if (inputElem.hasAttribute('required')) {
-          // console.log('event', inputElem.validity)
           errorInfo = {
             errorName: 'required',
             errorValue: inputElem.validity.valueMissing,
@@ -225,7 +220,6 @@
   })
 
   function reportError() {
-    // console.log(structuredClone(errorStatus))
     let eventSent = false
     for (let errorName in errorStatus) {
       const showMessage = errorStatus[errorName].showMessage
@@ -263,8 +257,6 @@
         LastErrorReported = 'any'
       }
     }
-
-    // console.log('errorStatus', errorId, errorStatus)
   }
 </script>
 

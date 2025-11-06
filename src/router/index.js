@@ -64,6 +64,11 @@ const router = createRouter({
       name: 'editUser',
       component: () => import('../views/EditUserView.vue'),
     },
+    {
+      path: '/tools',
+      name: 'tools',
+      component: () => import('../views/ToolsView.vue'),
+    },
   ],
 })
 

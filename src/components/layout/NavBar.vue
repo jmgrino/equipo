@@ -3,12 +3,14 @@
   import IconBars3 from '@/components/icons/IconBars3.vue'
   import IconClose from '@/components/icons/IconClose.vue'
   import { useAuthStore } from '@/stores/authStore'
+  import { useRouter } from 'vue-router'
 
   const versionNumber = ref(import.meta.env.VITE_APP_VERSION)
   const authStore = useAuthStore()
+  const router = useRouter()
 
   const isOpen = ref(false)
-  const showModSpace = ref(false)
+  // const showModSpace = ref(false)
   const userPage = computed(() => {
     if (authStore.user) {
       return { name: 'user', params: { id: authStore.user.id } }
@@ -31,6 +33,11 @@
 
   const modSpace = () => {
     authStore.showModSpace = true
+    isOpen.value = false
+  }
+
+  const openLink = link => {
+    router.push({ name: link })
     isOpen.value = false
   }
 </script>
@@ -75,11 +82,17 @@
           <a
             class="main-nav-link"
             @click="modSpace"
-            >Formato</a
           >
+            Formato
+          </a>
         </li>
-        <li>
-          <a class="main-nav-link">...</a>
+        <li class="list-item">
+          <a
+            class="main-nav-link"
+            @click="openLink('tools')"
+          >
+            Herramientas
+          </a>
         </li>
 
         <!-- <li><a class="main-nav-link nav-cta" @click="menu1">Action</a></li> -->

@@ -257,6 +257,37 @@ export const useRidesStore = defineStore('ridesStore', () => {
     }
   }
 
+  async function duplicateRide(rideId, newOwner) {
+    try {
+      const ride = await getRide(rideId)
+      const { id, ...baseRide } = ride
+      baseRide.name = baseRide.name + ' (copia)'
+      baseRide.date = ''
+      baseRide.lastDate = ''
+      baseRide.owner = newOwner
+
+      const newRideId = await addRide(baseRide)
+
+      // duplicate photos
+      const ridePhotos = photos.value.filter(photo => photo.ride === rideId)
+      ridePhotos.forEach(async photo => {
+        const { id: photoId, ...basePhoto } = photo
+        basePhoto.ride = newRideId
+        await addPhoto(basePhoto)
+      })
+
+      // duplicate tracks
+      const rideTracks = tracks.value.filter(track => track.ride === rideId)
+      rideTracks.forEach(async track => {
+        const { id: trackId, ...baseTrack } = track
+        baseTrack.ride = newRideId
+        await addTrack(baseTrack)
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   async function addDate(date) {
     const docRef = await addDoc(collection(db, 'dates'), date)
     return docRef.id
@@ -333,6 +364,19 @@ export const useRidesStore = defineStore('ridesStore', () => {
     }
   }
 
+  // Count number of photos with same path
+  function countPhotosPath(path) {
+    let count = 0
+    photos.value.forEach((photo, index) => {
+      if (photo.filePath === path) {
+        const rideName = rides.value.find(ride => ride.id === photo.ride)?.name
+        count++
+      }
+    })
+    return count
+  }
+
+  // Deep copy of an object
   function deepCopy(object) {
     let newObject
     try {
@@ -367,6 +411,7 @@ export const useRidesStore = defineStore('ridesStore', () => {
     updateRide,
     updateRideDates,
     deleteRide,
+    duplicateRide,
     addDate,
     deleteDate,
     addDateUser,
@@ -377,6 +422,7 @@ export const useRidesStore = defineStore('ridesStore', () => {
     checkValidPhotos,
     addPhoto,
     deletePhoto,
+    countPhotosPath,
     deepCopy,
     sortDates,
   }

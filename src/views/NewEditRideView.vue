@@ -40,16 +40,8 @@
   let timeoutID
 
   const modalRide = ref({})
-  const modalButtons = ref([
-    {
-      type: 'cancel',
-      label: 'Cancelar',
-    },
-    {
-      type: 'submit',
-      label: 'Borrar',
-    },
-  ])
+  const modalButtons = ref([])
+  const modalParagraph = ref('')
 
   if (route.params.id) {
     isNew.value = false
@@ -131,6 +123,12 @@
   async function deleteRide() {
     modalRide.value = formData
     modalRide.value.id = route.params.id
+
+    modalParagraph.value = '¿Seguro que quieres borrar esta ruta?'
+    modalButtons.value = [
+      { label: 'Cancelar', type: 'cancel' },
+      { label: 'Borrar', type: 'submit' },
+    ]
 
     modal.showModal(ModalOverlay)
     const result = await modal.waitAnswer()
@@ -453,7 +451,7 @@
     v-if="modal.show.value"
     :is="modal.component.value"
     :header="modalRide.name"
-    paragraph="¿Seguro que quieres borrar esta ruta?"
+    :paragraph="modalParagraph"
     :buttons="modalButtons"
     @close="modal.hideModal"
   />

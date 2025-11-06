@@ -18,17 +18,6 @@
     :class="{ owner: shortName.name === currentShortname }"
     >{{ shortName.name }}</span
   >
-  <!-- <span
-    class="text-color-std text-lg font-medium me-2 px-2.5 pt-0.5 pb-1 rounded-full"
-    :style="'background-color:' + shortName.color"
-    :class="{ owner: shortName.name === currentShortname }"
-    >{{ shortName.name }}</span
-  > -->
-  <!-- <span
-    class="bg-blue-100 text-blue-800 text-lg font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300"
-    :class="{ owner: shortName === currentShortname }"
-    >{{ shortName }}</span
-  > -->
 </template>
 
 <style scoped>

@@ -5,11 +5,15 @@
   import { useRouter, useRoute } from 'vue-router'
   import IconDelete from '@/components/icons/IconDelete.vue'
   import IconDownload from '@/components/icons/IconDownload.vue'
+  import { useModal } from '@/composables/utilities/useModal'
+  import ModalOverlay from '@/components/utilities/ModalOverlay.vue'
+  import { auth } from '@/db/firebase/firebase'
 
   const ridesStore = useRidesStore()
   const authStore = useAuthStore()
   const router = useRouter()
   const route = useRoute()
+  const modal = useModal()
 
   let ride = reactive({})
   let dates = reactive({})
@@ -21,11 +25,15 @@
   const routeOnwer = ref(false)
   const renderDates = ref(true)
   const showForm = ref(false)
-
+  ride
   const localShortDate = ref(false)
   const isMobile = ref(false)
   const datesRef = ref(null)
   let timeoutID
+
+  const modalRide = ref({})
+  const modalButtons = ref([])
+  const modalParagraph = ref('')
 
   const formData = reactive({
     date: '',
@@ -64,6 +72,22 @@
     ride = await ridesStore.getRide(id)
     dates = await ridesStore.getRideDates(id)
     tracks = ridesStore.tracks.filter(track => track.ride === ride.id)
+
+    for (let date of dates) {
+      const userNames = []
+      if (date.users) {
+        for (let user of date.users) {
+          // find user in ridesStore.users
+          const userName = ridesStore.users.find(u => u.id === user)?.name
+          if (userName) {
+            userNames.push(userName)
+          }
+        }
+        // sort userNames alphabetically
+        userNames.sort((a, b) => a.localeCompare(b))
+        date = Object.assign(date, { userNames: userNames.slice() })
+      }
+    }
 
     await ridesStore.checkValidPhotos()
 
@@ -126,6 +150,25 @@
 
   function editRide() {
     router.push({ name: 'editRide', params: { id: ride.id } })
+  }
+
+  async function duplicateRide() {
+    modalRide.value.id = route.params.id
+    modalRide.value.name = ride.name
+
+    modalParagraph.value = '¿Seguro que quieres duplicar esta ruta?'
+    modalButtons.value = [
+      { label: 'Cancelar', type: 'cancel' },
+      { label: 'Duplicar', type: 'submit' },
+    ]
+
+    modal.showModal(ModalOverlay)
+    const result = await modal.waitAnswer()
+
+    if (result) {
+      ridesStore.duplicateRide(route.params.id, authStore.user.id)
+      router.push({ name: 'rides' })
+    }
   }
 
   function showDateFields(value) {
@@ -271,6 +314,10 @@
           @onClick="router.push({ name: 'rides' })"
         />
         <AcceptButton
+          label="Duplicar"
+          @onClick="duplicateRide"
+        />
+        <AcceptButton
           v-if="routeOnwer"
           label="Editar"
           @onClick="editRide"
@@ -297,7 +344,10 @@
             :key="date?.date"
             ref="datesRef"
           >
-            <p :class="{ canceled: date.canceled === true }">
+            <p
+              class="pt-1"
+              :class="{ canceled: date.canceled === true }"
+            >
               {{ fDay(date.date, date.noDay) }} {{ fDate(date.date, date.noDay) }} {{ date.days }}&nbsp;{{
                 date.days == 1 ? 'dia&nbsp;' : 'dias'
               }}&nbsp;
@@ -320,7 +370,10 @@
                 Confirmar borrado
               </button>
             </div>
-            <div v-else>
+            <div
+              v-else
+              class="mb-1"
+            >
               <IconDelete
                 v-if="date.owner === authStore.user.id"
                 class="icon"
@@ -330,6 +383,12 @@
                 :stroke="date.users?.length ? 'rgba(90,118,135,0.5)' : 'currentcolor'"
               >
               </IconDelete>
+            </div>
+            <div
+              v-if="date.userNames"
+              class="font-sans text-cs-std -mt-2 col-span-full"
+            >
+              <span>({{ date.userNames.join(', ') }})</span>
             </div>
           </div>
         </template>
@@ -429,6 +488,14 @@
       </div>
     </div>
   </div>
+  <component
+    v-if="modal.show.value"
+    :is="modal.component.value"
+    :header="modalRide.name"
+    :paragraph="modalParagraph"
+    :buttons="modalButtons"
+    @close="modal.hideModal"
+  />
 </template>
 
 <style scoped>
@@ -455,6 +522,7 @@
     column-gap: 16px;
     font-family: cousine, monospace;
     grid-template-columns: minmax(20rem, max-content) 1fr;
+    grid-template-rows: min-content min-content;
   }
   .add-date-grid {
     display: grid;

@@ -46,8 +46,6 @@
 
   const showPassword = ref(false)
 
-  // console.log('UseId', useId())
-
   let errorStatus = {
     maxChars: {
       errorValue: false,
@@ -182,8 +180,6 @@
       emit('elemError', errorId, 'any', false)
       LastErrorReported = ''
     }
-
-    // console.log('errorStatus', errorId, errorStatus)
   }
 
   function togglePwd() {

@@ -6,7 +6,6 @@
   import RideItem from '@/components/RideItem.vue'
   import { useMinButton } from '@/composables/utilities/useMinButton'
   import { useFormatDate } from '@/composables/utilities/useFormatDate'
-  import IconCog from '@/components/icons/IconCog.vue'
   import IconPlus from '@/components/icons/IconPlus.vue'
   import IconMinus from '@/components/icons/IconMinus.vue'
 
@@ -121,6 +120,7 @@
             date.shortNames.push({
               id: dateUser,
               name: usersList.value[index].shortName,
+              fullName: usersList.value[index].name,
               color: usersList.value[index].color,
             })
           })

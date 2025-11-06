@@ -20,9 +20,6 @@ export function useValidation(inputErrorTable) {
   const errorTable = { ...inputErrorTable, default: defaultValues }
 
   function processElemError(elemId, errorName, status, errorInfo) {
-    // console.log('processElemError', elemId, errorName, status)
-    // console.log('errorInfo', errorInfo)
-
     let errorId
     errorId = elemId.split('$')[0]
     if (elemId.includes('$$') && alreadySubmitted.value) {
@@ -80,7 +77,6 @@ export function useValidation(inputErrorTable) {
         errorMessage.value = 'No se puede enviar porque hay errores en el formulario'
       }
     }
-    // console.log('ERRORS:', errors)
   }
 
   function formHasErrors(formData) {

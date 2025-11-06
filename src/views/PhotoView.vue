@@ -2,7 +2,7 @@
   import { reactive, ref, computed, nextTick } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { useRidesStore } from '@/stores/ridesStore'
-  import useStorage from '@/composables/useStorage'
+  import useStorage from '@/stores/useStorage'
   import IconDelete from '@/components/icons/IconDelete.vue'
   // import IconDownload from '@/components/icons/IconDownload.vue'
 
@@ -102,6 +102,9 @@
 
   async function confirmDeletePhoto(index) {
     clearTimeout(timeoutID)
+    const numPhotos = ridesStore.countPhotosPath(photos.value[index].filePath)
+    return
+
     await deleteFile(photos.value[index].filePath)
     await ridesStore.deletePhoto(photos.value[index].id)
     photos.value.splice(index, 1)
